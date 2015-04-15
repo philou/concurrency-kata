@@ -19,6 +19,7 @@
             <processorPath useClasspath="true" />
           </profile>
         </annotationProcessing>
+        <bytecodeTargetLevel target="1.7" />
       </component>
       <component name="MavenImportPreferences">
         <option name="generalSettings">
@@ -29,6 +30,46 @@
       </component>
       <component name="NamedScopeManager">
         <order />
+      </component>
+      <component name="ProjectInspectionProfilesVisibleTreeState">
+        <entry key="Project Default">
+          <profile-state>
+            <expanded-state>
+              <State>
+                <id />
+              </State>
+              <State>
+                <id>Class structureJava</id>
+              </State>
+              <State>
+                <id>Code maturity issuesJava</id>
+              </State>
+              <State>
+                <id>Java</id>
+              </State>
+              <State>
+                <id>Java language level migration aidsJava</id>
+              </State>
+              <State>
+                <id>Javadoc issuesJava</id>
+              </State>
+              <State>
+                <id>Performance issuesJava</id>
+              </State>
+              <State>
+                <id>TestNG</id>
+              </State>
+              <State>
+                <id>Threading issuesJava</id>
+              </State>
+            </expanded-state>
+            <selected-state>
+              <State>
+                <id>Android</id>
+              </State>
+            </selected-state>
+          </profile-state>
+        </entry>
       </component>
       <component name="ProjectLevelVcsManager" settingsEditedManually="false">
         <OptionsSetting value="true" id="Add" />
@@ -45,7 +86,7 @@
       </component>
       <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" default="true" assert-keyword="true" jdk-15="true" />
       <component name="PropertiesComponent">
-        <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
+        <property name="settings.editor.selected.configurable" value="configurable.group.tools" />
         <property name="settings.editor.splitter.proportion" value="0.2" />
       </component>
       <component name="RunManager">
@@ -134,6 +175,9 @@
           <listeners />
           <method />
         </configuration>
+      </component>
+      <component name="VcsContentAnnotationSettings">
+        <option name="myLimit" value="2678400000" />
       </component>
     </defaultProject>
   </component>
