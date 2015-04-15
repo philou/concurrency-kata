@@ -16,3 +16,7 @@ hs_err_pid*
 
 # vagrant files
 .vagrant
+
+# Intellij files
+*.iml
+.idea
