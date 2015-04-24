@@ -24,7 +24,7 @@
       <component name="MavenImportPreferences">
         <option name="generalSettings">
           <MavenGeneralSettings>
-            <option name="mavenHome" value="Bundled (Maven 3)" />
+            <option name="mavenHome" value="/usr/share/maven" />
           </MavenGeneralSettings>
         </option>
       </component>
