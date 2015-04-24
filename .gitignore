@@ -20,3 +20,6 @@ hs_err_pid*
 # Intellij files
 *.iml
 .idea
+
+# maven files
+target
