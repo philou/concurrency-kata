@@ -1,5 +1,7 @@
 package net.bourgau.philippe.concurrency.kata;
 
+import java.util.Scanner;
+
 public class Client {
     private final String name;
     private final Output out;
@@ -24,5 +26,20 @@ public class Client {
 
     public static String message(String name, String message) {
         return name + " > " + message;
+    }
+
+    public static void main(String[] args) {
+        Client client = new Client(args[0], new Output() {
+            public void write(String line) {
+                System.out.println(line);
+            }
+        });
+
+        client.enter();
+
+        Scanner scanner = new Scanner(System.in);
+        while (scanner.hasNextLine()) {
+            client.emit(scanner.nextLine());
+        }
     }
 }
