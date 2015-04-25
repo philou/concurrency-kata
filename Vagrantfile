@@ -89,10 +89,9 @@ Vagrant.configure(2) do |config|
     # sudo apt-get -y install openjdk-7-source openjdk-7-dbg
   SHELL
 
-  config.vm.provision "shell", privileged: false, inline: <<-SHELL
-    git config --global user.name "philou"
-    git config --global user.email "philippe.bourgau@gmail.com"
+  config.vm.provision "file", source: "~/.gitconfig", destination: "$HOME/.gitconfig"
 
+  config.vm.provision "shell", privileged: false, inline: <<-SHELL
     if [ ! -d "$HOME/.idea" ]; then
       echo "Installing IDEA"
 
@@ -103,7 +102,12 @@ Vagrant.configure(2) do |config|
 
       echo 'export PATH="$HOME/.idea/bin:$PATH"' >> ~/.bashrc
 
-      sed --in-place 's:# idea\.config\.path=.*:idea.config.path=/vagrant/.IdeaIC14/config:' $HOME/.idea/bin/idea.properties
+      mkdir --parents $HOME/.IdeaIC14/config
     fi
   SHELL
+
+  config.vm.provision "file", source: "Vagrantfiles/intellij/git.xml", destination: "$HOME/.IdeaIC14/config/options/git.xml"
+  config.vm.provision "file", source: "Vagrantfiles/intellij/jdk.table.xml", destination: "$HOME/.IdeaIC14/config/options/jdk.table.xml"
+  config.vm.provision "file", source: "Vagrantfiles/intellij/project.default.xml", destination: "$HOME/.IdeaIC14/config/options/project.default.xml"
+  config.vm.provision "file", source: "Vagrantfiles/intellij/mavenVersion.xml", destination: "$HOME/.IdeaIC14/config/options/mavenVersion.xml"
 end
