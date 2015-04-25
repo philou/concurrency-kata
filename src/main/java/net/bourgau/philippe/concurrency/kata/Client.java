@@ -19,14 +19,19 @@ public class Client implements Broadcast {
         chatRoom.broadcast(welcomeMessage(name));
     }
 
-
     public void write(String message) {
         chatRoom.broadcast(message(name, message));
     }
 
+
     @Override
     public void broadcast(String message) {
         out.write(message);
+    }
+
+    public void leave() {
+        chatRoom.broadcast(exitMessage(name));
+        chatRoom.leave(this);
     }
 
     public static String welcomeMessage(String name) {
@@ -35,6 +40,10 @@ public class Client implements Broadcast {
 
     public static String message(String name, String message) {
         return name + " > " + message;
+    }
+
+    static String exitMessage(String name) {
+        return name + " left";
     }
 
     public static void main(String[] args) {

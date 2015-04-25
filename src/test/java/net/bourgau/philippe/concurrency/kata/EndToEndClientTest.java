@@ -56,6 +56,27 @@ public class EndToEndClientTest {
         assertJoeOutput().contains(message("Jack", "Hi there !"));
     }
 
+    @Test
+    public void
+    a_client_can_leave_the_room() {
+        jack.enter();
+        jack.leave();
+
+        assertJoeOutput().contains(Client.exitMessage("Jack"));
+    }
+
+    @Test
+    public void
+    a_client_no_longer_receives_messages_after_he_left() {
+        jack.enter();
+
+        joe.leave();
+        jack.write("Are you there ?");
+
+        assertJoeOutput().doesNotContain(message("Jack", "Are you there ?"));
+    }
+
+
     /*
      client leaves the room (with executable)
      tcp client connection
