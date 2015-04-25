@@ -53,11 +53,19 @@ public class Client implements Broadcast {
             }
         });
 
-        client.enter();
+        try {
+            client.enter();
 
-        Scanner scanner = new Scanner(System.in);
-        while (scanner.hasNextLine()) {
-            client.broadcast(scanner.nextLine());
+            Scanner scanner = new Scanner(System.in);
+            while (scanner.hasNextLine()) {
+                String message = scanner.nextLine();
+                if (message.equals("bye")) {
+                    break;
+                }
+                client.broadcast(message);
+            }
+        } finally {
+            client.leave();
         }
     }
 }
