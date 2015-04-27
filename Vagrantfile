@@ -48,7 +48,7 @@ Vagrant.configure(2) do |config|
     # vb.gui = true
 
     # Customize the amount of memory on the VM:
-    vb.memory = "1024"
+    vb.memory = "2048"
   end
 
   # If true, X11 forwarding over SSH connections is enabled. Defaults to
@@ -99,6 +99,8 @@ Vagrant.configure(2) do |config|
       tar -zxvf ideaIC-14.1.1.tar.gz
 
       mv `find . -maxdepth 1 -type d -and -name "idea-IC-141*"` $HOME/.idea
+
+      sed --in-place 's/-Xmx[0-9]*m/-Xmx2048m/' $HOME/.idea/bin/idea.vmoptions
 
       echo 'export PATH="$HOME/.idea/bin:$PATH"' >> ~/.bashrc
 
