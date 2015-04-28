@@ -1,18 +1,29 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+#Check if you have the good Vagrant version to use docker provider...
+Vagrant.require_version ">= 1.6.0"
+
+# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
+VAGRANTFILE_API_VERSION = "2"
+
+# Use docker as default provider
+ENV['VAGRANT_DEFAULT_PROVIDER'] = 'docker'
+
+# This docker config was inspired by https://github.com/bubenkoff/vagrant-docker-example
+
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
 # configures the configuration version (we support older styles for
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
-Vagrant.configure(2) do |config|
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # The most common configuration options are documented and commented below.
   # For a complete reference, please see the online documentation at
   # https://docs.vagrantup.com.
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
-  config.vm.box = "ubuntu/trusty64"
+  # config.vm.box = "ubuntu/trusty64"
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -43,13 +54,19 @@ Vagrant.configure(2) do |config|
   # backing providers for Vagrant. These expose provider-specific options.
   # Example for VirtualBox:
   #
-  config.vm.provider "virtualbox" do |vb|
-    # Display the VirtualBox GUI when booting the machine
-    # vb.gui = true
+  config.vm.provider "docker" do |d|
+    # The path to a directory containing a Dockerfile. One of this or
+    # image is required.
+    d.build_dir = "."
 
-    # Customize the amount of memory on the VM:
-    vb.memory = "2048"
+    # If true, then Vagrant will support SSH with the container. This
+    # allows vagrant ssh to work, provisioners, etc. This defaults to
+    # false.
+    d.has_ssh = true
   end
+
+  # The port to SSH into. By default this is port 22.
+  config.ssh.port = 22
 
   # If true, X11 forwarding over SSH connections is enabled. Defaults to
   # false.
