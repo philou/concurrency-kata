@@ -1,24 +1,12 @@
 package net.bourgau.philippe.concurrency.kata;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.io.IOException;
 
-public class ChatRoom implements Broadcast {
-
-    private final Set<Broadcast> clients = new HashSet<>();
-
-    public void enter(Client client) {
-        clients.add(client);
-    }
+public interface ChatRoom extends Broadcast {
+    void enter(Broadcast client) throws Exception;
 
     @Override
-    public void broadcast(String message) {
-        for (Broadcast client : clients) {
-            client.broadcast(message);
-        }
-    }
+    void broadcast(String message) throws Exception;
 
-    public void leave(Client client) {
-        clients.remove(client);
-    }
+    void leave(Broadcast client) throws Exception;
 }

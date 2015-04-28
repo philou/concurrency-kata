@@ -14,22 +14,22 @@ public class Client implements Broadcast {
         this.out = out;
     }
 
-    public void enter() {
+    public void enter() throws Exception {
         chatRoom.enter(this);
         chatRoom.broadcast(welcomeMessage(name));
     }
 
-    public void write(String message) {
+    public void write(String message) throws Exception {
         chatRoom.broadcast(message(name, message));
     }
 
 
     @Override
-    public void broadcast(String message) {
+    public void broadcast(String message) throws Exception {
         out.write(message);
     }
 
-    public void leave() {
+    public void leave() throws Exception {
         chatRoom.broadcast(exitMessage(name));
         chatRoom.leave(this);
     }
@@ -46,8 +46,8 @@ public class Client implements Broadcast {
         return name + " left";
     }
 
-    public static void main(String[] args) {
-        Client client = new Client(args[0], new ChatRoom(), new Output() {
+    public static void main(String[] args) throws Exception {
+        Client client = new Client(args[0], new LocalChatRoom(), new Output() {
             public void write(String line) {
                 System.out.println(line);
             }
