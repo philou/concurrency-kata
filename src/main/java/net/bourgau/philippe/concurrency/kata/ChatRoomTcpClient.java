@@ -1,9 +1,20 @@
 package net.bourgau.philippe.concurrency.kata;
 
-public class ChatRoomTcpClient implements ChatRoom {
-    @Override
-    public void enter(Client client) {
+import java.net.InetSocketAddress;
+import java.net.Socket;
 
+public class ChatRoomTcpClient implements ChatRoom {
+    private final Socket socket;
+    private final InetSocketAddress serverAddress;
+
+    public ChatRoomTcpClient(String host, int port) {
+        serverAddress = new InetSocketAddress(host, port);
+        socket = new Socket();
+    }
+
+    @Override
+    public void enter(Client client) throws Exception {
+        socket.connect(serverAddress);
     }
 
     @Override

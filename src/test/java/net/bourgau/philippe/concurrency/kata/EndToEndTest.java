@@ -29,13 +29,13 @@ public abstract class EndToEndTest {
 
     @Test
     public void
-    a_client_receives_its_own_welcome_message() {
+    a_client_receives_its_own_welcome_message() throws Exception {
         assertJoeOutput().contains(welcomeMessage("Joe"));
     }
 
     @Test
     public void
-    a_client_receives_its_own_messages() {
+    a_client_receives_its_own_messages() throws Exception {
         joe.write("Hi everyone !");
 
         assertJoeOutput().contains(message("Joe", "Hi everyone !"));
@@ -43,7 +43,7 @@ public abstract class EndToEndTest {
 
     @Test
     public void
-    a_client_is_notified_of_newcomers() {
+    a_client_is_notified_of_newcomers() throws Exception {
         jack.enter();
 
         assertJoeOutput().contains(welcomeMessage("Jack"));
@@ -51,7 +51,7 @@ public abstract class EndToEndTest {
 
     @Test
     public void
-    two_clients_can_chat_together() {
+    two_clients_can_chat_together() throws Exception {
         jack.enter();
         jack.write("Hi there !");
 
@@ -60,7 +60,7 @@ public abstract class EndToEndTest {
 
     @Test
     public void
-    a_client_can_leave_the_room() {
+    a_client_can_leave_the_room() throws Exception {
         jack.enter();
         jack.leave();
 
@@ -69,7 +69,7 @@ public abstract class EndToEndTest {
 
     @Test
     public void
-    a_client_no_longer_receives_messages_after_he_left() {
+    a_client_no_longer_receives_messages_after_he_left() throws Exception {
         jack.enter();
 
         joe.leave();
@@ -77,12 +77,6 @@ public abstract class EndToEndTest {
 
         assertJoeOutput().doesNotContain(message("Jack", "Are you there ?"));
     }
-
-
-    /*
-     client leaves the room (with executable)
-     tcp client connection
-     */
 
     private StringAssert assertJoeOutput() {
         return assertThat(joeOutput.toString());

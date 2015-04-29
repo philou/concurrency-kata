@@ -14,7 +14,7 @@ public class Client implements Broadcast {
         this.out = out;
     }
 
-    public void enter() {
+    public void enter() throws Exception {
         chatRoom.enter(this);
         chatRoom.broadcast(welcomeMessage(name));
     }
@@ -46,7 +46,7 @@ public class Client implements Broadcast {
         return name + " left";
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         Client client = new Client(args[0], new InProcessChatRoom(), new Output() {
             public void write(String line) {
                 System.out.println(line);
