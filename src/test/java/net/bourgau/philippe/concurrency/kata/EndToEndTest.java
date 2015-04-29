@@ -8,22 +8,24 @@ import static net.bourgau.philippe.concurrency.kata.Client.message;
 import static net.bourgau.philippe.concurrency.kata.Client.welcomeMessage;
 import static org.fest.assertions.api.Assertions.assertThat;
 
-public class EndToEndClientTest {
+public abstract class EndToEndTest {
 
-    private ChatRoom chatRoom;
     private Client joe;
     private Output joeOutput;
     private Client jack;
 
     @Before
     public void before_each() throws Exception {
-        chatRoom = new ChatRoom();
         joeOutput = new MemoryOutput();
-        joe = new Client("Joe", chatRoom, joeOutput);
-        jack = new Client("Jack", chatRoom, new MemoryOutput());
+        joe = new Client("Joe", clientChatRoom(), joeOutput);
+        jack = new Client("Jack", serverChatRoom(), new MemoryOutput());
 
         joe.enter();
     }
+
+    protected abstract ChatRoom clientChatRoom();
+
+    protected abstract ChatRoom serverChatRoom();
 
     @Test
     public void

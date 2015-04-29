@@ -47,7 +47,7 @@ public class Client implements Broadcast {
     }
 
     public static void main(String[] args) {
-        Client client = new Client(args[0], new ChatRoom(), new Output() {
+        Client client = new Client(args[0], new InProcessChatRoom(), new Output() {
             public void write(String line) {
                 System.out.println(line);
             }
@@ -62,7 +62,7 @@ public class Client implements Broadcast {
                 if (message.equals("bye")) {
                     break;
                 }
-                client.broadcast(message);
+                client.write(message);
             }
         } finally {
             client.leave();
