@@ -1,5 +1,6 @@
 package net.bourgau.philippe.concurrency.kata;
 
+import org.junit.After;
 import org.junit.Ignore;
 
 @Ignore
@@ -15,6 +16,11 @@ public class EndToEndTcpTest extends EndToEndTest {
         clientChatRoom = new ChatRoomTcpClient("localhost", PORT);
         serverChatRoom = new ChatRoomTcpServer(PORT);
         super.before_each();
+    }
+
+    @After
+    public void after_each() throws Exception {
+        serverChatRoom.close();
     }
 
     @Override

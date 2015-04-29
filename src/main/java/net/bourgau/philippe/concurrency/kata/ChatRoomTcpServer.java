@@ -2,7 +2,7 @@ package net.bourgau.philippe.concurrency.kata;
 
 import java.net.ServerSocket;
 
-public class ChatRoomTcpServer implements ChatRoom {
+public class ChatRoomTcpServer implements ChatRoom, AutoCloseable {
 
     private final ServerSocket serverSocket;
 
@@ -23,5 +23,10 @@ public class ChatRoomTcpServer implements ChatRoom {
     @Override
     public void leave(Client client) {
 
+    }
+
+    @Override
+    public void close() throws Exception {
+        serverSocket.close();
     }
 }
