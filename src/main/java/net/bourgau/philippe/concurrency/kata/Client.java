@@ -19,7 +19,7 @@ public class Client implements Broadcast {
         chatRoom.broadcast(welcomeMessage(name));
     }
 
-    public void write(String message) {
+    public void write(String message) throws Exception {
         chatRoom.broadcast(message(name, message));
     }
 
@@ -29,27 +29,27 @@ public class Client implements Broadcast {
         out.write(message);
     }
 
-    public void leave() {
+    public void leave() throws Exception {
         chatRoom.broadcast(exitMessage(name));
         chatRoom.leave(this);
     }
 
     public static String welcomeMessage(String name) {
-        return "Welcome " + name + " !";
+        return String.format("Welcome %s !\n", name);
     }
 
     public static String message(String name, String message) {
-        return name + " > " + message;
+        return String.format("%s > %s\n", name, message);
     }
 
     static String exitMessage(String name) {
-        return name + " left";
+        return String.format("%s left\n", name);
     }
 
     public static void main(String[] args) throws Exception {
         Client client = new Client(args[0], new InProcessChatRoom(), new Output() {
             public void write(String line) {
-                System.out.println(line);
+                System.out.print(line);
             }
         });
 

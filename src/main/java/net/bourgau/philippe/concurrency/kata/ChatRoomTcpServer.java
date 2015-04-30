@@ -11,7 +11,7 @@ public class ChatRoomTcpServer implements ChatRoom, AutoCloseable {
     }
 
     @Override
-    public void enter(Client client) throws Exception {
+    public void enter(Broadcast client) throws Exception {
 
     }
 
@@ -21,7 +21,7 @@ public class ChatRoomTcpServer implements ChatRoom, AutoCloseable {
     }
 
     @Override
-    public void leave(Client client) {
+    public void leave(Broadcast client) {
 
     }
 

@@ -8,19 +8,19 @@ public class InProcessChatRoom implements ChatRoom {
     private final Set<Broadcast> clients = new HashSet<>();
 
     @Override
-    public void enter(Client client) {
+    public void enter(Broadcast client) {
         clients.add(client);
     }
 
     @Override
-    public void broadcast(String message) {
+    public void broadcast(String message) throws Exception {
         for (Broadcast client : clients) {
             client.broadcast(message);
         }
     }
 
     @Override
-    public void leave(Client client) {
+    public void leave(Broadcast client) {
         clients.remove(client);
     }
 }

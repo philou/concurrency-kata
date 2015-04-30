@@ -13,7 +13,7 @@ public class ChatRoomTcpClient implements ChatRoom {
     }
 
     @Override
-    public void enter(Client client) throws Exception {
+    public void enter(Broadcast client) throws Exception {
         socket.connect(serverAddress);
     }
 
@@ -23,7 +23,7 @@ public class ChatRoomTcpClient implements ChatRoom {
     }
 
     @Override
-    public void leave(Client client) {
+    public void leave(Broadcast client) {
 
     }
 }
