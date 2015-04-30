@@ -2,17 +2,18 @@ package net.bourgau.philippe.concurrency.kata;
 
 import org.junit.After;
 import org.junit.Ignore;
+import org.junit.Test;
 
 @Ignore
 public class EndToEndTcpTest extends EndToEndTest {
 
     public static final int PORT = 1278;
 
-    private ChatRoomTcpServer serverChatRoom;
+    private TcpChatRoomServer serverChatRoom;
 
     @Override
     public void before_each() throws Exception {
-        serverChatRoom = ChatRoomTcpServer.start(PORT);
+        serverChatRoom = TcpChatRoomServer.start(PORT);
         super.before_each();
     }
 
@@ -21,8 +22,15 @@ public class EndToEndTcpTest extends EndToEndTest {
         serverChatRoom.close();
     }
 
+    @Test
+    public void
+    the_server_can_be_stoped_straight_away() throws Exception {
+        Thread.sleep(500);
+        serverChatRoom.close();
+    }
+
     @Override
     protected ChatRoom aClientChatRoom() {
-        return new ChatRoomTcpClient("localhost", PORT);
+        return new TcpChatRoomProxy("localhost", PORT);
     }
 }
