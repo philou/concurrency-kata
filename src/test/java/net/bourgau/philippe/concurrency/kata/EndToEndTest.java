@@ -1,9 +1,13 @@
 package net.bourgau.philippe.concurrency.kata;
 
+import com.jayway.awaitility.Awaitility;
+import com.jayway.awaitility.core.ConditionFactory;
+import com.jayway.awaitility.core.ConditionTimeoutException;
 import org.fest.assertions.api.StringAssert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static net.bourgau.philippe.concurrency.kata.Client.message;
 import static net.bourgau.philippe.concurrency.kata.Client.welcomeMessage;
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -28,7 +32,12 @@ public abstract class EndToEndTest {
     @Test
     public void
     a_client_receives_its_own_welcome_message() throws Exception {
-        assertJoeOutput().contains(welcomeMessage("Joe"));
+        await().until(new Runnable() {
+            @Override
+            public void run() {
+                joeOutput().contains(welcomeMessage("Joe"));
+            }
+        });
     }
 
     @Test
@@ -36,7 +45,12 @@ public abstract class EndToEndTest {
     a_client_receives_its_own_messages() throws Exception {
         joe.write("Hi everyone !");
 
-        assertJoeOutput().contains(message("Joe", "Hi everyone !"));
+        await().until(new Runnable() {
+            @Override
+            public void run() {
+                joeOutput().contains(message("Joe", "Hi everyone !"));
+            }
+        });
     }
 
     @Test
@@ -44,7 +58,12 @@ public abstract class EndToEndTest {
     a_client_is_notified_of_newcomers() throws Exception {
         jack.enter();
 
-        assertJoeOutput().contains(welcomeMessage("Jack"));
+        await().until(new Runnable() {
+            @Override
+            public void run() {
+                joeOutput().contains(welcomeMessage("Jack"));
+            }
+        });
     }
 
     @Test
@@ -53,7 +72,12 @@ public abstract class EndToEndTest {
         jack.enter();
         jack.write("Hi there !");
 
-        assertJoeOutput().contains(message("Jack", "Hi there !"));
+        await().until(new Runnable() {
+            @Override
+            public void run() {
+                joeOutput().contains(message("Jack", "Hi there !"));
+            }
+        });
     }
 
     @Test
@@ -62,10 +86,15 @@ public abstract class EndToEndTest {
         jack.enter();
         jack.leave();
 
-        assertJoeOutput().contains(Client.exitMessage("Jack"));
+        await().until(new Runnable() {
+            @Override
+            public void run() {
+                joeOutput().contains(Client.exitMessage("Jack"));
+            }
+        });
     }
 
-    @Test
+    @Test(expected = ConditionTimeoutException.class)
     public void
     a_client_no_longer_receives_messages_after_he_left() throws Exception {
         jack.enter();
@@ -73,10 +102,19 @@ public abstract class EndToEndTest {
         joe.leave();
         jack.write("Are you there ?");
 
-        assertJoeOutput().doesNotContain(message("Jack", "Are you there ?"));
+        await().until(new Runnable() {
+            @Override
+            public void run() {
+                joeOutput().contains(message("Jack", "Are you there ?"));
+            }
+        });
     }
 
-    private StringAssert assertJoeOutput() {
+    private StringAssert joeOutput() {
         return assertThat(joeOutput.toString());
+    }
+
+    private static ConditionFactory await() {
+        return Awaitility.await().atMost(1, SECONDS);
     }
 }
