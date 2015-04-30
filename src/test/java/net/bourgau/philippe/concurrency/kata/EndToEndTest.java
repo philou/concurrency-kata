@@ -17,15 +17,13 @@ public abstract class EndToEndTest {
     @Before
     public void before_each() throws Exception {
         joeOutput = new MemoryOutput();
-        joe = new Client("Joe", clientChatRoom(), joeOutput);
-        jack = new Client("Jack", serverChatRoom(), new MemoryOutput());
+        joe = new Client("Joe", aClientChatRoom(), joeOutput);
+        jack = new Client("Jack", aClientChatRoom(), new MemoryOutput());
 
         joe.enter();
     }
 
-    protected abstract ChatRoom clientChatRoom();
-
-    protected abstract ChatRoom serverChatRoom();
+    protected abstract ChatRoom aClientChatRoom();
 
     @Test
     public void

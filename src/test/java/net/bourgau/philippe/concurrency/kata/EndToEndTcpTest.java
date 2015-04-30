@@ -8,13 +8,11 @@ public class EndToEndTcpTest extends EndToEndTest {
 
     public static final int PORT = 1278;
 
-    private ChatRoomTcpClient clientChatRoom;
     private ChatRoomTcpServer serverChatRoom;
 
     @Override
     public void before_each() throws Exception {
-        clientChatRoom = new ChatRoomTcpClient("localhost", PORT);
-        serverChatRoom = new ChatRoomTcpServer(PORT);
+        serverChatRoom = ChatRoomTcpServer.start(PORT);
         super.before_each();
     }
 
@@ -24,14 +22,7 @@ public class EndToEndTcpTest extends EndToEndTest {
     }
 
     @Override
-    protected ChatRoom clientChatRoom() {
-        return clientChatRoom;
+    protected ChatRoom aClientChatRoom() {
+        return new ChatRoomTcpClient("localhost", PORT);
     }
-
-    @Override
-    protected ChatRoom serverChatRoom() {
-        return serverChatRoom;
-    }
-
-
 }
