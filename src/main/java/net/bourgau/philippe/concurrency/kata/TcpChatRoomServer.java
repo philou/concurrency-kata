@@ -17,28 +17,20 @@ public class TcpChatRoomServer implements AutoCloseable {
         chatRoom = new InProcessChatRoom();
         threadPool = Executors.newCachedThreadPool();
         serverSocket = new ServerSocket(port);
-        threadPool.submit(new Runnable() {
+        threadPool.submit(new SafeRunnable() {
 
             @Override
-            public void run() {
-                try {
-                    Socket socket = serverSocket.accept();
-                    final BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    chatRoom.enter(new TcpClientProxy(socket));
-                    threadPool.submit(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                String message = reader.readLine() + "\n" ;
-                                chatRoom.broadcast(message);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    });
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            protected void unsafeRun() throws Exception {
+                Socket socket = serverSocket.accept();
+                final BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                chatRoom.enter(new TcpClientProxy(socket));
+                threadPool.submit(new SafeRunnable() {
+                    @Override
+                    protected void unsafeRun() throws Exception {
+                        String message = reader.readLine() + "\n" ;
+                        chatRoom.broadcast(message);
+                    }
+                });
             }
         });
     }
