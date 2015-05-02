@@ -35,21 +35,21 @@ public class Client implements Broadcast {
     }
 
     public static String welcomeMessage(String name) {
-        return String.format("Welcome %s !\n", name);
+        return String.format("Welcome %s !", name);
     }
 
     public static String message(String name, String message) {
-        return String.format("%s > %s\n", name, message);
+        return String.format("%s > %s", name, message);
     }
 
     static String exitMessage(String name) {
-        return String.format("%s left\n", name);
+        return String.format("%s left", name);
     }
 
     public static void main(String[] args) throws Exception {
         Client client = new Client(args[0], new InProcessChatRoom(), new Output() {
             public void write(String line) {
-                System.out.print(line);
+                System.out.println(line);
             }
         });
 

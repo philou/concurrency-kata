@@ -18,11 +18,11 @@ public class Protocol {
     }
 
     public void writeMessage(String message) throws Exception {
-        writer.write(message);
+        writer.write(message + "\n");
         writer.flush();
     }
 
     public String readMessage() throws Exception {
-        return reader.readLine() + "\n" ;
+        return reader.readLine();
     }
 }
