@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 
-public class Protocol {
+public class Protocol implements AutoCloseable {
     private final Socket socket;
     private BufferedReader reader;
     private BufferedWriter writer;
@@ -24,5 +24,9 @@ public class Protocol {
 
     public String readMessage() throws Exception {
         return reader.readLine();
+    }
+
+    @Override
+    public void close() throws Exception {
     }
 }

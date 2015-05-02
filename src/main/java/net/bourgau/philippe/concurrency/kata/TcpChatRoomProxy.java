@@ -19,7 +19,9 @@ public class TcpChatRoomProxy implements ChatRoom {
         new Thread(new SafeRunnable() {
             @Override
             protected void unsafeRun() throws Exception {
-                client.broadcast(protocol.readMessage());
+                while (true) {
+                    client.broadcast(protocol.readMessage());
+                }
             }
         }).start();
     }
@@ -30,7 +32,6 @@ public class TcpChatRoomProxy implements ChatRoom {
     }
 
     @Override
-    public void leave(Broadcast client) {
-
+    public void leave(Broadcast client) throws Exception {
     }
 }
