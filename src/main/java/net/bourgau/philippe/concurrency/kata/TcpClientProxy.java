@@ -19,7 +19,7 @@ public class TcpClientProxy extends SafeRunnable implements Broadcast {
 
     @Override
     protected void unsafeRun() throws Exception {
-        while (true) {
+        while (!Thread.interrupted()) {
             chatRoom.broadcast(protocol.readMessage());
         }
     }

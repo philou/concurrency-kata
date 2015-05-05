@@ -4,6 +4,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class TcpChatRoomServer extends SafeRunnable implements AutoCloseable {
 
@@ -31,5 +32,10 @@ public class TcpChatRoomServer extends SafeRunnable implements AutoCloseable {
     @Override
     public void close() throws Exception {
         serverSocket.close();
+        threadPool.shutdown();
+        threadPool.shutdownNow();
+        if (!threadPool.awaitTermination(1, TimeUnit.SECONDS)) {
+            System.err.println("Failed to stop all server threads");
+        }
     }
 }
