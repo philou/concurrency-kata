@@ -14,9 +14,9 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 public abstract class EndToEndTest {
 
-    private Client joe;
+    protected Client joe;
+    protected Client jack;
     private Output joeOutput;
-    private Client jack;
 
     @Before
     public void before_each() throws Exception {
@@ -96,7 +96,22 @@ public abstract class EndToEndTest {
 
     @Test(expected = ConditionTimeoutException.class)
     public void
-    a_client_no_longer_receives_messages_after_he_left() throws Exception {
+    a_client_cannot_write_after_it_left() throws Exception {
+        joe.leave();
+
+        joe.write("Hello ?");
+
+        await().until(new Runnable() {
+            @Override
+            public void run() {
+                joeOutput().contains(message("Joe", "Hello ?"));
+            }
+        });
+    }
+
+    @Test(expected = ConditionTimeoutException.class)
+    public void
+    a_client_no_longer_receives_messages_after_it_left() throws Exception {
         jack.enter();
 
         joe.leave();
@@ -110,11 +125,11 @@ public abstract class EndToEndTest {
         });
     }
 
-    private StringAssert joeOutput() {
+    protected StringAssert joeOutput() {
         return assertThat(joeOutput.toString());
     }
 
-    private static ConditionFactory await() {
+    protected static ConditionFactory await() {
         return Awaitility.await().atMost(1, SECONDS);
     }
 }
