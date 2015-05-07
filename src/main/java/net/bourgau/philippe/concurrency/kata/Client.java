@@ -15,12 +15,11 @@ public class Client implements Broadcast {
     }
 
     public void enter() throws Exception {
-        chatRoom.enter(this);
-        chatRoom.broadcast(welcomeMessage(name));
+        chatRoom.enter(name, this);
     }
 
     public void write(String message) throws Exception {
-        chatRoom.broadcast(message(name, message));
+        chatRoom.broadcast(Message.signed(name, message));
     }
 
 
@@ -30,20 +29,8 @@ public class Client implements Broadcast {
     }
 
     public void leave() throws Exception {
-        chatRoom.broadcast(exitMessage(name));
+        chatRoom.broadcast(Message.exit(name));
         chatRoom.leave(this);
-    }
-
-    public static String welcomeMessage(String name) {
-        return String.format("Welcome %s !", name);
-    }
-
-    public static String message(String name, String message) {
-        return String.format("%s > %s", name, message);
-    }
-
-    static String exitMessage(String name) {
-        return String.format("%s left", name);
     }
 
     public static void main(String[] args) throws Exception {

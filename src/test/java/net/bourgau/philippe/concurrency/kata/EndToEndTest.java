@@ -8,8 +8,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static net.bourgau.philippe.concurrency.kata.Client.message;
-import static net.bourgau.philippe.concurrency.kata.Client.welcomeMessage;
+import static net.bourgau.philippe.concurrency.kata.Message.signed;
+import static net.bourgau.philippe.concurrency.kata.Message.welcome;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 public abstract class EndToEndTest {
@@ -35,7 +35,7 @@ public abstract class EndToEndTest {
         await().until(new Runnable() {
             @Override
             public void run() {
-                joeOutput().contains(welcomeMessage("Joe"));
+                joeOutput().contains(welcome("Joe"));
             }
         });
     }
@@ -48,7 +48,7 @@ public abstract class EndToEndTest {
         await().until(new Runnable() {
             @Override
             public void run() {
-                joeOutput().contains(message("Joe", "Hi everyone !"));
+                joeOutput().contains(signed("Joe", "Hi everyone !"));
             }
         });
     }
@@ -61,7 +61,7 @@ public abstract class EndToEndTest {
         await().until(new Runnable() {
             @Override
             public void run() {
-                joeOutput().contains(welcomeMessage("Jack"));
+                joeOutput().contains(welcome("Jack"));
             }
         });
     }
@@ -75,7 +75,7 @@ public abstract class EndToEndTest {
         await().until(new Runnable() {
             @Override
             public void run() {
-                joeOutput().contains(message("Jack", "Hi there !"));
+                joeOutput().contains(signed("Jack", "Hi there !"));
             }
         });
     }
@@ -89,7 +89,7 @@ public abstract class EndToEndTest {
         await().until(new Runnable() {
             @Override
             public void run() {
-                joeOutput().contains(Client.exitMessage("Jack"));
+                joeOutput().contains(Message.exit("Jack"));
             }
         });
     }
@@ -104,7 +104,7 @@ public abstract class EndToEndTest {
         await().until(new Runnable() {
             @Override
             public void run() {
-                joeOutput().contains(message("Joe", "Hello ?"));
+                joeOutput().contains(signed("Joe", "Hello ?"));
             }
         });
     }
@@ -120,7 +120,7 @@ public abstract class EndToEndTest {
         await().until(new Runnable() {
             @Override
             public void run() {
-                joeOutput().contains(message("Jack", "Are you there ?"));
+                joeOutput().contains(signed("Jack", "Are you there ?"));
             }
         });
     }
