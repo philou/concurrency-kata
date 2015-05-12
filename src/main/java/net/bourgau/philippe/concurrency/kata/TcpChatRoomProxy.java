@@ -14,7 +14,7 @@ public class TcpChatRoomProxy implements ChatRoom {
     }
 
     @Override
-    public void enter(final String pseudo, final Output client) throws Exception {
+    public void enter(final Output client, final String pseudo) throws Exception {
         protocol = new Protocol(new Socket(host, port));
         protocol.writeMessage(pseudo);
         tcpThread = new Thread(new SafeRunnable() {
@@ -30,7 +30,7 @@ public class TcpChatRoomProxy implements ChatRoom {
     }
 
     @Override
-    public void broadcast(String message) throws Exception {
+    public void broadcast(Output client, String message) throws Exception {
         protocol.writeMessage(message);
     }
 

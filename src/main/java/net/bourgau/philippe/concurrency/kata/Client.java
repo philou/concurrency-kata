@@ -7,6 +7,7 @@ public class Client implements Output {
     private final ChatRoom chatRoom;
     private final String name;
     private final Output out;
+    private boolean entered;
 
     public Client(String name, ChatRoom chatRoom, Output out) {
         this.chatRoom = chatRoom;
@@ -15,11 +16,15 @@ public class Client implements Output {
     }
 
     public void enter() throws Exception {
-        chatRoom.enter(name, this);
+        chatRoom.enter(this, name);
+        entered = true;
     }
 
     public void announce(String message) throws Exception {
-        chatRoom.broadcast(Message.signed(name, message));
+        if (!entered) {
+            throw new IllegalStateException("Client cannot write messages after leaving the room.");
+        }
+        chatRoom.broadcast(this, message);
     }
 
     @Override
@@ -30,6 +35,7 @@ public class Client implements Output {
     public void leave() throws Exception {
         chatRoom.leave(this);
         write(Message.selfExit());
+        entered = false;
     }
 
     public static void main(String[] args) throws Exception {

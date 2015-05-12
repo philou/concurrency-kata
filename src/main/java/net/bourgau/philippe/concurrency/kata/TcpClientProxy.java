@@ -21,9 +21,9 @@ public class TcpClientProxy extends SafeRunnable implements Output {
     @Override
     protected void unsafeRun() throws Exception {
         try {
-            chatRoom.enter(protocol.readMessage(), this);
+            chatRoom.enter(this, protocol.readMessage());
             while (!Thread.interrupted()) {
-                chatRoom.broadcast(protocol.readMessage());
+                chatRoom.broadcast(this, protocol.readMessage());
             }
         } catch (SocketException e) {
             chatRoom.leave(this);

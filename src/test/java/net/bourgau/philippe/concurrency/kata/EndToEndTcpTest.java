@@ -95,12 +95,27 @@ public class EndToEndTcpTest extends EndToEndTest {
         });
     }
 
+    @Test
+    public void
+    imposters_cannot_send_misssigned_messages() throws Exception {
+        final Protocol imposter = new Protocol(new Socket("localhost", PORT));
+        imposter.writeMessage("Imposter");
+
+        imposter.writeMessage("Joe > I am stupid !");
+
+        await().until(new Runnable() {
+            @Override
+            public void run() {
+                joeOutput().contains(Message.signed("Imposter", "Joe > I am stupid !"));
+            }
+        });
+    }
+
+
     /*
-    pass the client to the server in the broadcast message
     make all close/leave methods exception free
     client can leave many times without issues (just make joe and jack leave at the end)
     once the room is closed, client.write should throw
-    once the client left, client.write should throw
     the room can be closed many times without issues
     inject executors to make sure threads are closed
      */
