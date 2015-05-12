@@ -43,7 +43,7 @@ public abstract class EndToEndTest {
     @Test
     public void
     a_client_receives_its_own_messages() throws Exception {
-        joe.write("Hi everyone !");
+        joe.announce("Hi everyone !");
 
         await().until(new Runnable() {
             @Override
@@ -70,7 +70,7 @@ public abstract class EndToEndTest {
     public void
     two_clients_can_chat_together() throws Exception {
         jack.enter();
-        jack.write("Hi there !");
+        jack.announce("Hi there !");
 
         await().until(new Runnable() {
             @Override
@@ -83,6 +83,19 @@ public abstract class EndToEndTest {
     @Test
     public void
     a_client_can_leave_the_room() throws Exception {
+        joe.leave();
+
+        await().until(new Runnable() {
+            @Override
+            public void run() {
+                joeOutput().contains(Message.selfExit());
+            }
+        });
+    }
+
+    @Test
+    public void
+    a_client_is_notified_of_the_departure_of_others() throws Exception {
         jack.enter();
         jack.leave();
 
@@ -94,19 +107,12 @@ public abstract class EndToEndTest {
         });
     }
 
-    @Test(expected = ConditionTimeoutException.class)
+    @Test(expected = Exception.class)
     public void
     a_client_cannot_write_after_it_left() throws Exception {
         joe.leave();
 
-        joe.write("Hello ?");
-
-        await().until(new Runnable() {
-            @Override
-            public void run() {
-                joeOutput().contains(signed("Joe", "Hello ?"));
-            }
-        });
+        joe.announce("Hello ?");
     }
 
     @Test(expected = ConditionTimeoutException.class)
@@ -115,7 +121,7 @@ public abstract class EndToEndTest {
         jack.enter();
 
         joe.leave();
-        jack.write("Are you there ?");
+        jack.announce("Are you there ?");
 
         await().until(new Runnable() {
             @Override

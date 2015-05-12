@@ -2,7 +2,7 @@ package net.bourgau.philippe.concurrency.kata;
 
 import java.util.Scanner;
 
-public class Client implements Broadcast {
+public class Client implements Output {
 
     private final ChatRoom chatRoom;
     private final String name;
@@ -18,19 +18,18 @@ public class Client implements Broadcast {
         chatRoom.enter(name, this);
     }
 
-    public void write(String message) throws Exception {
+    public void announce(String message) throws Exception {
         chatRoom.broadcast(Message.signed(name, message));
     }
 
-
     @Override
-    public void broadcast(String message) {
+    public void write(String message) throws Exception {
         out.write(message);
     }
 
     public void leave() throws Exception {
-        chatRoom.broadcast(Message.exit(name));
         chatRoom.leave(this);
+        write(Message.selfExit());
     }
 
     public static void main(String[] args) throws Exception {
@@ -49,7 +48,7 @@ public class Client implements Broadcast {
                 if (message.equals("bye")) {
                     break;
                 }
-                client.write(message);
+                client.announce(message);
             }
         } finally {
             client.leave();

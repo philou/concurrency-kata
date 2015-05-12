@@ -28,5 +28,6 @@ public class Protocol implements AutoCloseable {
 
     @Override
     public void close() throws Exception {
+        socket.close();
     }
 }

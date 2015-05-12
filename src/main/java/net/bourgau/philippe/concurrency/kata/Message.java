@@ -12,4 +12,8 @@ public final class Message {
     static String exit(String name) {
         return String.format("%s left", name);
     }
+
+    public static String selfExit() {
+        return "You left the room";
+    }
 }

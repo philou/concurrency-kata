@@ -14,14 +14,14 @@ public class TcpChatRoomProxy implements ChatRoom {
     }
 
     @Override
-    public void enter(final String pseudo, final Broadcast client) throws Exception {
+    public void enter(final String pseudo, final Output client) throws Exception {
         protocol = new Protocol(new Socket(host, port));
         protocol.writeMessage(pseudo);
         tcpThread = new Thread(new SafeRunnable() {
             @Override
             protected void unsafeRun() throws Exception {
                 while (!Thread.interrupted()) {
-                    client.broadcast(protocol.readMessage());
+                    client.write(protocol.readMessage());
                 }
             }
         });
@@ -35,11 +35,15 @@ public class TcpChatRoomProxy implements ChatRoom {
     }
 
     @Override
-    public void leave(Broadcast client) throws Exception {
+    public void leave(Output client) throws Exception {
         if (tcpThread != null) {
             tcpThread.interrupt();
+            protocol.close();
+
             tcpThread.join(1000);
+
             tcpThread = null;
+            protocol = null;
         }
     }
 }

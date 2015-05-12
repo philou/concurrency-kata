@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import java.net.Socket;
 
+import static net.bourgau.philippe.concurrency.kata.Message.exit;
 import static net.bourgau.philippe.concurrency.kata.Message.signed;
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -38,7 +39,7 @@ public class EndToEndTcpTest extends EndToEndTest {
     clients_cannot_write_after_the_room_is_closed() throws Exception {
         serverChatRoom.close();
 
-        joe.write("Hello ?");
+        joe.announce("Hello ?");
 
         await().until(new Runnable() {
             @Override
@@ -54,7 +55,7 @@ public class EndToEndTcpTest extends EndToEndTest {
         jack.enter();
         serverChatRoom.close();
 
-        jack.write("Hello ?");
+        jack.announce("Hello ?");
 
         await().until(new Runnable() {
             @Override
@@ -72,13 +73,31 @@ public class EndToEndTcpTest extends EndToEndTest {
         await().until(new SafeRunnable() {
             @Override
             public void unsafeRun() throws Exception {
-                joe.write("Who is it ?");
+                joe.announce("Who is it ?");
                 assertThat(sneaker.readMessage()).contains("Who is it ?");
             }
         });
     }
 
+    @Test
+    public void
+    client_crashes_should_be_announced_to_other_clients() throws Exception {
+        final Protocol bogus = new Protocol(new Socket("localhost", PORT));
+        bogus.writeMessage("Bogus");
+
+        bogus.close();
+
+        await().until(new Runnable() {
+            @Override
+            public void run() {
+                joeOutput().contains(exit("Bogus"));
+            }
+        });
+    }
+
     /*
+    pass the client to the server in the broadcast message
+    make all close/leave methods exception free
     client can leave many times without issues (just make joe and jack leave at the end)
     once the room is closed, client.write should throw
     once the client left, client.write should throw
