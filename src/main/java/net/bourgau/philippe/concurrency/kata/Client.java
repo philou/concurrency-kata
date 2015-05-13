@@ -39,7 +39,7 @@ public class Client implements Output {
     }
 
     public static void main(String[] args) throws Exception {
-        Client client = new Client(args[0], new InProcessChatRoom(), new Output() {
+        Client client = new Client(args[2], new TcpChatRoomProxy(args[0], Integer.parseInt(args[1]), new CachedThreadPool()), new Output() {
             public void write(String line) {
                 System.out.println(line);
             }
