@@ -1,17 +1,19 @@
 package net.bourgau.philippe.concurrency.kata;
 
+import org.apache.commons.io.IOUtils;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 
-public class Protocol implements AutoCloseable {
+public class TextLineProtocol implements AutoCloseable {
     private final Socket socket;
     private BufferedReader reader;
     private BufferedWriter writer;
 
-    public Protocol(Socket socket) throws Exception {
+    public TextLineProtocol(Socket socket) throws Exception {
         this.socket = socket;
         reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
@@ -27,7 +29,7 @@ public class Protocol implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
-        socket.close();
+    public void close() {
+        IOUtils.closeQuietly(socket);
     }
 }

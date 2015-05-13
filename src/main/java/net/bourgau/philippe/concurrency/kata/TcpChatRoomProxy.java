@@ -5,19 +5,21 @@ import java.net.Socket;
 public class TcpChatRoomProxy implements ChatRoom {
     private final String host;
     private final int port;
-    private Protocol protocol;
-    private Thread tcpThread;
+    private final ThreadPool threadPool;
+    private TextLineProtocol protocol;
 
-    public TcpChatRoomProxy(String host, int port) {
+    public TcpChatRoomProxy(String host, int port, ThreadPool threadPool) {
         this.host = host;
         this.port = port;
+        this.threadPool = threadPool;
     }
 
     @Override
     public void enter(final Output client, final String pseudo) throws Exception {
-        protocol = new Protocol(new Socket(host, port));
+        protocol = new TextLineProtocol(new Socket(host, port));
         protocol.writeMessage(pseudo);
-        tcpThread = new Thread(new SafeRunnable() {
+
+        threadPool.submit(new SafeRunnable() {
             @Override
             protected void unsafeRun() throws Exception {
                 while (!Thread.interrupted()) {
@@ -25,8 +27,6 @@ public class TcpChatRoomProxy implements ChatRoom {
                 }
             }
         });
-
-        tcpThread.start();
     }
 
     @Override
@@ -36,14 +36,11 @@ public class TcpChatRoomProxy implements ChatRoom {
 
     @Override
     public void leave(Output client) throws Exception {
-        if (tcpThread != null) {
-            tcpThread.interrupt();
+        if (protocol != null) {
             protocol.close();
-
-            tcpThread.join(1000);
-
-            tcpThread = null;
             protocol = null;
+
+            threadPool.shutdownQuietly();
         }
     }
 }

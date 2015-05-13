@@ -6,11 +6,11 @@ import java.net.SocketException;
 public class TcpClientProxy extends SafeRunnable implements Output {
 
     private final ChatRoom chatRoom;
-    private final Protocol protocol;
+    private final TextLineProtocol protocol;
 
     public TcpClientProxy(Socket socket, ChatRoom chatRoom) throws Exception {
         this.chatRoom = chatRoom;
-        this.protocol = new Protocol(socket);
+        this.protocol = new TextLineProtocol(socket);
     }
 
     @Override

@@ -68,7 +68,7 @@ public class EndToEndTcpTest extends EndToEndTest {
     @Test(expected = ConditionTimeoutException.class)
     public void
     sneakers_should_not_receive_messages() throws Exception {
-        final Protocol sneaker = new Protocol(new Socket("localhost", PORT));
+        final TextLineProtocol sneaker = new TextLineProtocol(new Socket("localhost", PORT));
 
         await().until(new SafeRunnable() {
             @Override
@@ -82,7 +82,7 @@ public class EndToEndTcpTest extends EndToEndTest {
     @Test
     public void
     client_crashes_should_be_announced_to_other_clients() throws Exception {
-        final Protocol bogus = new Protocol(new Socket("localhost", PORT));
+        final TextLineProtocol bogus = new TextLineProtocol(new Socket("localhost", PORT));
         bogus.writeMessage("Bogus");
 
         bogus.close();
@@ -98,7 +98,7 @@ public class EndToEndTcpTest extends EndToEndTest {
     @Test
     public void
     imposters_cannot_send_misssigned_messages() throws Exception {
-        final Protocol imposter = new Protocol(new Socket("localhost", PORT));
+        final TextLineProtocol imposter = new TextLineProtocol(new Socket("localhost", PORT));
         imposter.writeMessage("Imposter");
 
         imposter.writeMessage("Joe > I am stupid !");
@@ -122,7 +122,7 @@ public class EndToEndTcpTest extends EndToEndTest {
 
     @Override
     protected ChatRoom aClientChatRoom() {
-        return new TcpChatRoomProxy("localhost", PORT);
+        return new TcpChatRoomProxy("localhost", PORT, new CachedThreadPool());
     }
 
 }
