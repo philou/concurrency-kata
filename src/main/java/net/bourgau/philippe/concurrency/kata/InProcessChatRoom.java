@@ -1,5 +1,6 @@
 package net.bourgau.philippe.concurrency.kata;
 
+import java.net.SocketException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,9 +26,19 @@ public class InProcessChatRoom implements ChatRoom {
     }
 
     @Override
-    public void leave(Output client) throws Exception {
+    public void leave(Output client) {
         String pseudo = clients.get(client);
         clients.remove(client);
-        broadcast(Message.exit(pseudo));
+        broadcastQuietly(pseudo);
+    }
+
+    private void broadcastQuietly(String pseudo) {
+        try {
+            broadcast(Message.exit(pseudo));
+        } catch (SocketException e) {
+            // quietly
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

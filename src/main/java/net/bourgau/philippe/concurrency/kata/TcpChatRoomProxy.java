@@ -1,6 +1,7 @@
 package net.bourgau.philippe.concurrency.kata;
 
 import java.net.Socket;
+import java.net.SocketException;
 
 public class TcpChatRoomProxy implements ChatRoom {
     private final String host;
@@ -22,8 +23,12 @@ public class TcpChatRoomProxy implements ChatRoom {
         threadPool.submit(new SafeRunnable() {
             @Override
             protected void unsafeRun() throws Exception {
-                while (!Thread.interrupted()) {
-                    client.write(protocol.readMessage());
+                try {
+                    while (!Thread.interrupted()) {
+                        client.write(protocol.readMessage());
+                    }
+                } catch (SocketException e) {
+                    // socket closed
                 }
             }
         });
@@ -35,11 +40,9 @@ public class TcpChatRoomProxy implements ChatRoom {
     }
 
     @Override
-    public void leave(Output client) throws Exception {
+    public void leave(Output client) {
         if (protocol != null) {
             protocol.close();
-            protocol = null;
-
             threadPool.shutdownQuietly();
         }
     }

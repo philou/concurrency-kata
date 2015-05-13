@@ -3,7 +3,7 @@ package net.bourgau.philippe.concurrency.kata;
 public class ThreadPoolSpy implements ThreadPool {
 
     private final ThreadPool implementation;
-    public transient boolean shutDown;
+    public volatile boolean shutDown;
 
     ThreadPoolSpy(ThreadPool implementation) {
         this.implementation = implementation;

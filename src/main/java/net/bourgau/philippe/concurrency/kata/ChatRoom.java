@@ -5,5 +5,5 @@ public interface ChatRoom {
 
     void broadcast(Output client, String message) throws Exception;
 
-    void leave(Output client) throws Exception;
+    void leave(Output client);
 }

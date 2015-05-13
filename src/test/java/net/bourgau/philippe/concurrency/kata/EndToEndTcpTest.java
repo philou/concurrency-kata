@@ -66,24 +66,24 @@ public class EndToEndTcpTest extends EndToEndTest {
     @Test(expected = ConditionTimeoutException.class)
     public void
     sneakers_should_not_receive_messages() throws Exception {
-        final TextLineProtocol sneaker = new TextLineProtocol(new Socket("localhost", PORT));
+        try (TextLineProtocol sneaker = new TextLineProtocol(new Socket("localhost", PORT))) {
 
-        await().until(new SafeRunnable() {
-            @Override
-            public void unsafeRun() throws Exception {
-                joe.announce("Who is it ?");
-                assertThat(sneaker.readMessage()).contains("Who is it ?");
-            }
-        });
+            await().until(new SafeRunnable() {
+                @Override
+                public void unsafeRun() throws Exception {
+                    joe.announce("Who is it ?");
+                    assertThat(sneaker.readMessage()).contains("Who is it ?");
+                }
+            });
+        }
     }
 
     @Test
     public void
     client_crashes_should_be_announced_to_other_clients() throws Exception {
-        final TextLineProtocol bogus = new TextLineProtocol(new Socket("localhost", PORT));
-        bogus.writeMessage("Bogus");
-
-        bogus.close();
+        try (TextLineProtocol bogus = new TextLineProtocol(new Socket("localhost", PORT))) {
+            bogus.writeMessage("Bogus");
+        }
 
         await().until(new Runnable() {
             @Override
@@ -96,17 +96,18 @@ public class EndToEndTcpTest extends EndToEndTest {
     @Test
     public void
     imposters_cannot_send_misssigned_messages() throws Exception {
-        final TextLineProtocol imposter = new TextLineProtocol(new Socket("localhost", PORT));
-        imposter.writeMessage("Imposter");
+        try (TextLineProtocol imposter = new TextLineProtocol(new Socket("localhost", PORT))) {
+            imposter.writeMessage("Imposter");
 
-        imposter.writeMessage("Joe > I am stupid !");
+            imposter.writeMessage("Joe > I am stupid !");
 
-        await().until(new Runnable() {
-            @Override
-            public void run() {
-                joeOutput().contains(Message.signed("Imposter", "Joe > I am stupid !"));
-            }
-        });
+            await().until(new Runnable() {
+                @Override
+                public void run() {
+                    joeOutput().contains(Message.signed("Imposter", "Joe > I am stupid !"));
+                }
+            });
+        }
     }
 
     @Test

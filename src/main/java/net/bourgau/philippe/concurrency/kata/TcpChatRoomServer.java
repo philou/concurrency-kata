@@ -4,6 +4,7 @@ import org.apache.commons.io.IOUtils;
 
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class TcpChatRoomServer extends SafeRunnable implements AutoCloseable {
 
@@ -19,10 +20,14 @@ public class TcpChatRoomServer extends SafeRunnable implements AutoCloseable {
 
     @Override
     protected void unsafeRun() throws Exception {
-        while (!Thread.interrupted()) {
-            Socket socket = serverSocket.accept();
-            TcpClientProxy clientProxy = new TcpClientProxy(socket, chatRoom);
-            threadPool.submit(clientProxy);
+        try {
+            while (!Thread.interrupted()) {
+                Socket socket = serverSocket.accept();
+                TcpClientProxy clientProxy = new TcpClientProxy(socket, chatRoom);
+                threadPool.submit(clientProxy);
+            }
+        } catch (SocketException e) {
+            // socket closed
         }
     }
 
