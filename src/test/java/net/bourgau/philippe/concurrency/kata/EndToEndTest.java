@@ -4,6 +4,7 @@ import com.jayway.awaitility.Awaitility;
 import com.jayway.awaitility.core.ConditionFactory;
 import com.jayway.awaitility.core.ConditionTimeoutException;
 import org.fest.assertions.api.StringAssert;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -25,6 +26,12 @@ public abstract class EndToEndTest {
         jack = new Client("Jack", aClientChatRoom(), new MemoryOutput());
 
         joe.enter();
+    }
+
+    @After
+    public void after_each() throws Exception {
+        joe.leave();
+        jack.leave();
     }
 
     protected abstract ChatRoom aClientChatRoom();

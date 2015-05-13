@@ -26,8 +26,8 @@ public class TcpChatRoomServer extends SafeRunnable implements AutoCloseable {
         }
     }
 
-    public static TcpChatRoomServer start(int port) throws Exception {
-        return new TcpChatRoomServer(port, new CachedThreadPool());
+    public static TcpChatRoomServer start(int port, ThreadPool threadPool) throws Exception {
+        return new TcpChatRoomServer(port, threadPool);
     }
 
     @Override

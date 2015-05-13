@@ -1,7 +1,6 @@
 package net.bourgau.philippe.concurrency.kata;
 
 import com.jayway.awaitility.core.ConditionTimeoutException;
-import org.junit.After;
 import org.junit.Test;
 
 import java.net.Socket;
@@ -15,22 +14,21 @@ public class EndToEndTcpTest extends EndToEndTest {
     public static final int PORT = 1278;
 
     private TcpChatRoomServer serverChatRoom;
+    private ThreadPoolSpy serverThreadPool;
 
     @Override
     public void before_each() throws Exception {
-        serverChatRoom = TcpChatRoomServer.start(PORT);
+        serverThreadPool = newThreadPool();
+        serverChatRoom = TcpChatRoomServer.start(PORT, serverThreadPool);
         super.before_each();
     }
 
-    @After
-    public void after_each() throws Exception {
-        serverChatRoom.close();
+    private ThreadPoolSpy newThreadPool() {
+        return new ThreadPoolSpy(new CachedThreadPool());
     }
 
-    @Test
-    public void
-    the_server_can_be_stoped_straight_away() throws Exception {
-        Thread.sleep(500);
+    public void after_each() throws Exception {
+        super.after_each();
         serverChatRoom.close();
     }
 
@@ -111,18 +109,42 @@ public class EndToEndTcpTest extends EndToEndTest {
         });
     }
 
+    @Test
+    public void
+    closing_the_server_interrupts_its_threads() throws Exception {
+        serverChatRoom.close();
 
-    /*
-    make all close/leave methods exception free
-    client can leave many times without issues (just make joe and jack leave at the end)
-    once the room is closed, client.write should throw
-    the room can be closed many times without issues
-    inject executors to make sure threads are closed
-     */
+        await().until(new Runnable() {
+            @Override
+            public void run() {
+                assertThat(serverThreadPool.shutDown).isTrue();
+            }
+        });
+    }
+
+    @Test
+    public void
+    closing_the_client_interrupts_its_thread() throws Exception {
+        final ThreadPoolSpy clientThread = newThreadPool();
+        final Client jim = new Client("Jim", aClientChatRoom(clientThread), new MemoryOutput());
+        jim.enter();
+        jim.leave();
+
+        await().until(new Runnable() {
+            @Override
+            public void run() {
+                assertThat(clientThread.shutDown).isTrue();
+            }
+        });
+    }
 
     @Override
     protected ChatRoom aClientChatRoom() {
-        return new TcpChatRoomProxy("localhost", PORT, new CachedThreadPool());
+        return aClientChatRoom(newThreadPool());
+    }
+
+    private ChatRoom aClientChatRoom(ThreadPool threadPool) {
+        return new TcpChatRoomProxy("localhost", PORT, threadPool);
     }
 
 }
