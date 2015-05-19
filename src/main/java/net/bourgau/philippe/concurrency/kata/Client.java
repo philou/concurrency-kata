@@ -1,5 +1,6 @@
 package net.bourgau.philippe.concurrency.kata;
 
+import java.io.IOException;
 import java.util.Scanner;
 
 public class Client implements Output {
@@ -20,7 +21,7 @@ public class Client implements Output {
         entered = true;
     }
 
-    public void announce(String message) throws Exception {
+    public void announce(String message) throws IOException {
         if (!entered) {
             throw new IllegalStateException("Client cannot write messages after leaving the room.");
         }

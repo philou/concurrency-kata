@@ -2,9 +2,9 @@ package net.bourgau.philippe.concurrency.kata;
 
 import org.apache.commons.io.IOUtils;
 
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
 
 public class TcpChatRoomServer extends SafeRunnable implements AutoCloseable {
 
@@ -26,7 +26,7 @@ public class TcpChatRoomServer extends SafeRunnable implements AutoCloseable {
                 TcpClientProxy clientProxy = new TcpClientProxy(socket, chatRoom);
                 threadPool.submit(clientProxy);
             }
-        } catch (SocketException connectionClosedException) {
+        } catch (IOException connectionClosedException) {
         }
     }
 

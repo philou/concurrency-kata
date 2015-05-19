@@ -3,8 +3,8 @@ package net.bourgau.philippe.concurrency.kata;
 import com.jayway.awaitility.core.ConditionTimeoutException;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.net.Socket;
-import java.net.SocketException;
 
 import static net.bourgau.philippe.concurrency.kata.Message.exit;
 import static net.bourgau.philippe.concurrency.kata.Message.signed;
@@ -82,7 +82,7 @@ public class EndToEndTcpTest extends EndToEndTest {
                     joe.announce("Who is it ?");
                     try {
                         assertThat(sneaker.readMessage()).contains("Who is it ?");
-                    } catch (SocketException connectionClosedExecption) {
+                    } catch (IOException connectionClosedExecption) {
                     }
                 }
             });
@@ -149,13 +149,6 @@ public class EndToEndTcpTest extends EndToEndTest {
             }
         });
     }
-
-    /*
-        fix error logs
-        can readMessage throw only checked SocketException ?
-        can broadcast not throw ?
-        add a big concurrent test
-     */
 
     @Override
     protected ChatRoom aClientChatRoom() {

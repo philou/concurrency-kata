@@ -1,7 +1,7 @@
 package net.bourgau.philippe.concurrency.kata;
 
+import java.io.IOException;
 import java.net.Socket;
-import java.net.SocketException;
 
 public class TcpChatRoomProxy implements ChatRoom {
     private final String host;
@@ -16,7 +16,7 @@ public class TcpChatRoomProxy implements ChatRoom {
     }
 
     @Override
-    public void enter(final Output client, final String pseudo) throws Exception {
+    public void enter(final Output client, final String pseudo) throws IOException {
         protocol = new TextLineProtocol(new Socket(host, port));
         protocol.writeMessage(pseudo);
 
@@ -27,17 +27,17 @@ public class TcpChatRoomProxy implements ChatRoom {
                     while (!Thread.interrupted()) {
                         client.write(protocol.readMessage());
                     }
-                } catch (SocketException connectionClosedException) {
+                } catch (IOException connectionClosedException) {
                 }
             }
         });
     }
 
     @Override
-    public void broadcast(Output client, String message) throws Exception {
+    public void broadcast(Output client, String message) throws IOException {
         try {
             protocol.writeMessage(message);
-        } catch (SocketException connectionClosedException) {
+        } catch (IOException connectionClosedException) {
         }
     }
 

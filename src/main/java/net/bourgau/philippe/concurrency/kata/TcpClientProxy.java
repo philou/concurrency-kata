@@ -1,7 +1,7 @@
 package net.bourgau.philippe.concurrency.kata;
 
+import java.io.IOException;
 import java.net.Socket;
-import java.net.SocketException;
 
 public class TcpClientProxy extends SafeRunnable implements Output {
 
@@ -19,13 +19,13 @@ public class TcpClientProxy extends SafeRunnable implements Output {
     }
 
     @Override
-    protected void unsafeRun() throws Exception {
+    protected void unsafeRun() throws IOException {
         try {
             chatRoom.enter(this, protocol.readMessage());
             while (!Thread.interrupted()) {
                 chatRoom.broadcast(this, protocol.readMessage());
             }
-        } catch (SocketException connectionClosedException) {
+        } catch (IOException connectionClosedException) {
             chatRoom.leave(this);
             protocol.close();
         }
