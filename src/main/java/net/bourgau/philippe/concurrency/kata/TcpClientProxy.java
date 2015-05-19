@@ -25,7 +25,7 @@ public class TcpClientProxy extends SafeRunnable implements Output {
             while (!Thread.interrupted()) {
                 chatRoom.broadcast(this, protocol.readMessage());
             }
-        } catch (SocketException e) {
+        } catch (SocketException connectionClosedException) {
             chatRoom.leave(this);
             protocol.close();
         }

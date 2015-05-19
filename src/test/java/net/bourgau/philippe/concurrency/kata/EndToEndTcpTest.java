@@ -4,6 +4,7 @@ import com.jayway.awaitility.core.ConditionTimeoutException;
 import org.junit.Test;
 
 import java.net.Socket;
+import java.net.SocketException;
 
 import static net.bourgau.philippe.concurrency.kata.Message.exit;
 import static net.bourgau.philippe.concurrency.kata.Message.signed;
@@ -13,11 +14,15 @@ public class EndToEndTcpTest extends EndToEndTest {
 
     public static final int PORT = 1278;
 
+    private ErrorsCatcher errors;
     private TcpChatRoomServer serverChatRoom;
     private ThreadPoolSpy serverThreadPool;
 
     @Override
     public void before_each() throws Exception {
+        errors = new ErrorsCatcher();
+        Errors.override(errors);
+
         serverThreadPool = newThreadPool();
         serverChatRoom = TcpChatRoomServer.start(PORT, serverThreadPool);
         super.before_each();
@@ -30,6 +35,9 @@ public class EndToEndTcpTest extends EndToEndTest {
     public void after_each() throws Exception {
         super.after_each();
         serverChatRoom.close();
+
+        errors.shouldNotHaveBeenReported();
+        Errors.reset();
     }
 
     @Test(expected = ConditionTimeoutException.class)
@@ -72,7 +80,10 @@ public class EndToEndTcpTest extends EndToEndTest {
                 @Override
                 public void unsafeRun() throws Exception {
                     joe.announce("Who is it ?");
-                    assertThat(sneaker.readMessage()).contains("Who is it ?");
+                    try {
+                        assertThat(sneaker.readMessage()).contains("Who is it ?");
+                    } catch (SocketException connectionClosedExecption) {
+                    }
                 }
             });
         }
@@ -138,6 +149,13 @@ public class EndToEndTcpTest extends EndToEndTest {
             }
         });
     }
+
+    /*
+        fix error logs
+        can readMessage throw only checked SocketException ?
+        can broadcast not throw ?
+        add a big concurrent test
+     */
 
     @Override
     protected ChatRoom aClientChatRoom() {

@@ -5,6 +5,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import static net.bourgau.philippe.concurrency.kata.Errors.errors;
+
 public class CachedThreadPool implements ThreadPool {
     private final ExecutorService threadPool = Executors.newCachedThreadPool();
 
@@ -23,8 +25,7 @@ public class CachedThreadPool implements ThreadPool {
                 throw new TimeoutException();
             }
         } catch (Exception e) {
-            System.err.println("Failed to stop all the threads because " + e);
-            e.printStackTrace();
+            errors().log(new Exception("Failed to stop all threads", e));
         }
     }
 }

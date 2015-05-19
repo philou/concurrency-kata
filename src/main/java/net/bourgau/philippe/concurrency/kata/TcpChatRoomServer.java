@@ -26,8 +26,7 @@ public class TcpChatRoomServer extends SafeRunnable implements AutoCloseable {
                 TcpClientProxy clientProxy = new TcpClientProxy(socket, chatRoom);
                 threadPool.submit(clientProxy);
             }
-        } catch (SocketException e) {
-            // socket closed
+        } catch (SocketException connectionClosedException) {
         }
     }
 

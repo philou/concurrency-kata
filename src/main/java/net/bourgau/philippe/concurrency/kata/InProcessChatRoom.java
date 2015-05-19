@@ -1,12 +1,11 @@
 package net.bourgau.philippe.concurrency.kata;
 
-import java.net.SocketException;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class InProcessChatRoom implements ChatRoom {
 
-    private final Map<Output, String> clients = new HashMap<>();
+    private final Map<Output, String> clients = new ConcurrentHashMap<>();
 
     @Override
     public void enter(Output client, String pseudo) throws Exception {
@@ -15,13 +14,21 @@ public class InProcessChatRoom implements ChatRoom {
     }
 
     @Override
-    public void broadcast(Output client, String message) throws Exception {
+    public void broadcast(Output client, String message) {
         broadcast(Message.signed(clients.get(client), message));
     }
 
-    private void broadcast(String message) throws Exception {
+    private void broadcast(String message) {
         for (Output client : clients.keySet()) {
+            safeWrite(client, message);
+        }
+    }
+
+    private void safeWrite(Output client, String message) {
+        try {
             client.write(message);
+        } catch (Exception e) {
+            leave(client);
         }
     }
 
@@ -29,16 +36,6 @@ public class InProcessChatRoom implements ChatRoom {
     public void leave(Output client) {
         String pseudo = clients.get(client);
         clients.remove(client);
-        broadcastQuietly(pseudo);
-    }
-
-    private void broadcastQuietly(String pseudo) {
-        try {
-            broadcast(Message.exit(pseudo));
-        } catch (SocketException e) {
-            // quietly
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        broadcast(Message.exit(pseudo));
     }
 }

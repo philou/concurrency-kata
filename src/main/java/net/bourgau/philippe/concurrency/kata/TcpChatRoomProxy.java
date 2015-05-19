@@ -27,8 +27,7 @@ public class TcpChatRoomProxy implements ChatRoom {
                     while (!Thread.interrupted()) {
                         client.write(protocol.readMessage());
                     }
-                } catch (SocketException e) {
-                    // socket closed
+                } catch (SocketException connectionClosedException) {
                 }
             }
         });
@@ -36,7 +35,10 @@ public class TcpChatRoomProxy implements ChatRoom {
 
     @Override
     public void broadcast(Output client, String message) throws Exception {
-        protocol.writeMessage(message);
+        try {
+            protocol.writeMessage(message);
+        } catch (SocketException connectionClosedException) {
+        }
     }
 
     @Override
