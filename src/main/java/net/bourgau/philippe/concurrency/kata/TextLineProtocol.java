@@ -7,6 +7,8 @@ import java.io.BufferedWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 
 public class TextLineProtocol implements AutoCloseable {
     private final Socket socket;
@@ -15,6 +17,7 @@ public class TextLineProtocol implements AutoCloseable {
 
     public TextLineProtocol(Socket socket) throws Exception {
         this.socket = socket;
+        socket.setSoTimeout(250);
         reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
     }
@@ -25,7 +28,19 @@ public class TextLineProtocol implements AutoCloseable {
     }
 
     public String readMessage() throws Exception {
-        return reader.readLine();
+        String message = null;
+        while (!Thread.interrupted()) {
+            try {
+                message = reader.readLine();
+                break;
+            } catch (SocketTimeoutException ignoreTimeoutAndRetry) {
+                continue;
+            }
+        }
+        if (message == null) {
+            throw new SocketException("Socket was closed before a message could be read");
+        }
+        return message;
     }
 
     @Override
