@@ -1,12 +1,12 @@
 package net.bourgau.philippe.concurrency.kata;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class InProcessChatRoom implements ChatRoom {
 
-    private final Map<Output, String> clients = new ConcurrentHashMap<>();
+    private final Map<Output, String> clients = new HashMap<>();
 
     @Override
     public void enter(Output client, String pseudo) throws IOException {
