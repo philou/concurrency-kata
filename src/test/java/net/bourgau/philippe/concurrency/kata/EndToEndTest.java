@@ -9,8 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static net.bourgau.philippe.concurrency.kata.Message.signed;
-import static net.bourgau.philippe.concurrency.kata.Message.welcome;
+import static net.bourgau.philippe.concurrency.kata.Message.*;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 public abstract class EndToEndTest {
@@ -39,12 +38,7 @@ public abstract class EndToEndTest {
     @Test
     public void
     a_client_receives_its_own_welcome_message() throws Exception {
-        await().until(new Runnable() {
-            @Override
-            public void run() {
-                joeOutput().contains(welcome("Joe"));
-            }
-        });
+        joeShouldReceive(welcome("Joe"));
     }
 
     @Test
@@ -52,12 +46,7 @@ public abstract class EndToEndTest {
     a_client_receives_its_own_messages() throws Exception {
         joe.announce("Hi everyone !");
 
-        await().until(new Runnable() {
-            @Override
-            public void run() {
-                joeOutput().contains(signed("Joe", "Hi everyone !"));
-            }
-        });
+        joeShouldReceive(signed("Joe", "Hi everyone !"));
     }
 
     @Test
@@ -65,12 +54,7 @@ public abstract class EndToEndTest {
     a_client_is_notified_of_newcomers() throws Exception {
         jack.enter();
 
-        await().until(new Runnable() {
-            @Override
-            public void run() {
-                joeOutput().contains(welcome("Jack"));
-            }
-        });
+        joeShouldReceive(welcome("Jack"));
     }
 
     @Test
@@ -79,12 +63,7 @@ public abstract class EndToEndTest {
         jack.enter();
         jack.announce("Hi there !");
 
-        await().until(new Runnable() {
-            @Override
-            public void run() {
-                joeOutput().contains(signed("Jack", "Hi there !"));
-            }
-        });
+        joeShouldReceive(signed("Jack", "Hi there !"));
     }
 
     @Test
@@ -92,12 +71,7 @@ public abstract class EndToEndTest {
     a_client_can_leave_the_room() throws Exception {
         joe.leave();
 
-        await().until(new Runnable() {
-            @Override
-            public void run() {
-                joeOutput().contains(Message.selfExit());
-            }
-        });
+        joeShouldReceive(selfExit());
     }
 
     @Test
@@ -106,12 +80,7 @@ public abstract class EndToEndTest {
         jack.enter();
         jack.leave();
 
-        await().until(new Runnable() {
-            @Override
-            public void run() {
-                joeOutput().contains(Message.exit("Jack"));
-            }
-        });
+        joeShouldReceive(exit("Jack"));
     }
 
     @Test(expected = Exception.class)
@@ -130,10 +99,14 @@ public abstract class EndToEndTest {
         joe.leave();
         jack.announce("Are you there ?");
 
+        joeShouldReceive(signed("Jack", "Are you there ?"));
+    }
+
+    protected void joeShouldReceive(final String message) {
         await().until(new Runnable() {
             @Override
             public void run() {
-                joeOutput().contains(signed("Jack", "Are you there ?"));
+                joeOutput().contains(message);
             }
         });
     }

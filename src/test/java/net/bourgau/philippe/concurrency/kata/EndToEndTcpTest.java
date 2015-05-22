@@ -1,13 +1,16 @@
 package net.bourgau.philippe.concurrency.kata;
 
+import com.jayway.awaitility.Awaitility;
 import com.jayway.awaitility.core.ConditionTimeoutException;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
-import static net.bourgau.philippe.concurrency.kata.Message.exit;
-import static net.bourgau.philippe.concurrency.kata.Message.signed;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static net.bourgau.philippe.concurrency.kata.Message.*;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 public class EndToEndTcpTest extends EndToEndTest {
@@ -47,12 +50,7 @@ public class EndToEndTcpTest extends EndToEndTest {
 
         joe.announce("Hello ?");
 
-        await().until(new Runnable() {
-            @Override
-            public void run() {
-                joeOutput().contains(signed("Joe", "Hello ?"));
-            }
-        });
+        joeShouldReceive(signed("Joe", "Hello ?"));
     }
 
     @Test(expected = ConditionTimeoutException.class)
@@ -63,12 +61,7 @@ public class EndToEndTcpTest extends EndToEndTest {
 
         jack.announce("Hello ?");
 
-        await().until(new Runnable() {
-            @Override
-            public void run() {
-                joeOutput().contains(signed("Jack", "Hello ?"));
-            }
-        });
+        joeShouldReceive(signed("Jack", "Hello ?"));
     }
 
     @Test(expected = ConditionTimeoutException.class)
@@ -96,12 +89,7 @@ public class EndToEndTcpTest extends EndToEndTest {
             bogus.writeMessage("Bogus");
         }
 
-        await().until(new Runnable() {
-            @Override
-            public void run() {
-                joeOutput().contains(exit("Bogus"));
-            }
-        });
+        joeShouldReceive(exit("Bogus"));
     }
 
     @Test
@@ -112,12 +100,7 @@ public class EndToEndTcpTest extends EndToEndTest {
 
             imposter.writeMessage("Joe > I am stupid !");
 
-            await().until(new Runnable() {
-                @Override
-                public void run() {
-                    joeOutput().contains(Message.signed("Imposter", "Joe > I am stupid !"));
-                }
-            });
+            joeShouldReceive(Message.signed("Imposter", "Joe > I am stupid !"));
         }
     }
 
@@ -150,6 +133,102 @@ public class EndToEndTcpTest extends EndToEndTest {
         });
     }
 
+    @Test
+    public void
+    it_supports_a_large_number_of_clients() throws Exception {
+        joeShouldReceive(welcome("Joe"));
+
+        new ConcurrentTest(100, 20).run();
+    }
+
+    private class ConcurrentTest {
+
+        private final int clientsCount;
+        private final int messagesCount;
+        private final List<CountingOutput> outputs = new ArrayList<>();
+        private final List<Client> clients = new ArrayList<>();
+
+        private ConcurrentTest(int clientsCount, int messagesCount) {
+            this.clientsCount = clientsCount;
+            this.messagesCount = messagesCount;
+
+            createOutputs();
+            createClients();
+        }
+
+        public void run() throws Exception {
+            allClientsEnter();
+
+            allClientsSendMessages();
+
+            allClientsShouldReceiveAllTheMessages();
+        }
+
+        private void allClientsEnter() throws Exception {
+            clientsAskToEnter();
+            waitUntilClientsAreEntered();
+            resetOutputs();
+        }
+
+        private void allClientsSendMessages() throws IOException {
+            for (Client client : clients) {
+                for (int i = 0; i < messagesCount; i++) {
+                    client.announce("Hi there, this is message #" + i);
+                }
+            }
+        }
+
+        private void allClientsShouldReceiveAllTheMessages() {
+            Awaitility.await().atMost(10, SECONDS).until(new Runnable() {
+                @Override
+                public void run() {
+                    for (CountingOutput output : outputs) {
+                        CountingOutputAssert.assertThat(output).hasCountOf(clientsCount * messagesCount);
+                    }
+                }
+            });
+        }
+
+        private void clientsAskToEnter() throws Exception {
+            for (Client client : clients) {
+                client.enter();
+            }
+        }
+
+        private void waitUntilClientsAreEntered() {
+            Awaitility.await().atMost(5, SECONDS).until(new Runnable() {
+                @Override
+                public void run() {
+                    CountingOutputAssert.assertThat(outputs.get(0)).hasCountOf(clientsCount);
+                }
+            });
+        }
+
+        private void resetOutputs() {
+            for (int i = 0; i < outputs.size(); i++) {
+                CountingOutput output = outputs.get(i);
+                output.reset();
+            }
+        }
+
+        private void createOutputs() {
+            for (int i = 0; i < clientsCount; i++) {
+                outputs.add(new CountingOutput());
+            }
+        }
+
+        private void createClients() {
+            for (int i = 0; i < outputs.size(); i++) {
+                Output output = outputs.get(i);
+                clients.add(aNewClient("John" + i, output));
+            }
+        }
+
+        private Client aNewClient(String name, Output output) {
+            return new Client(name, aClientChatRoom(), output);
+        }
+    }
+
     @Override
     protected ChatRoom aClientChatRoom() {
         return aClientChatRoom(newThreadPool());
@@ -158,5 +237,4 @@ public class EndToEndTcpTest extends EndToEndTest {
     private ChatRoom aClientChatRoom(ThreadPool threadPool) {
         return new TcpChatRoomProxy("localhost", PORT, threadPool);
     }
-
 }
