@@ -3,8 +3,9 @@ Walkthrough the implementation of a basic chatroom, from crude locks to more abs
 
 ## Installation
 
-Start hacking using ```./hack.sh```
-```
+You will need vagrant with docker support.
+
+Then just start hacking using ```./hack.sh``` the password for vagrant is simply 'vagrant'.
 
 ### Troubleshooting
 
