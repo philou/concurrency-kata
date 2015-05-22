@@ -9,13 +9,13 @@ public class InProcessChatRoom implements ChatRoom {
     private final Map<Output, String> clients = new HashMap<>();
 
     @Override
-    public void enter(Output client, String pseudo) throws IOException {
+    synchronized public void enter(Output client, String pseudo) throws IOException {
         clients.put(client, pseudo);
         broadcast(Message.welcome(pseudo));
     }
 
     @Override
-    public void broadcast(Output client, String message) throws IOException {
+    synchronized public void broadcast(Output client, String message) throws IOException {
         broadcast(Message.signed(clients.get(client), message));
     }
 
@@ -34,7 +34,7 @@ public class InProcessChatRoom implements ChatRoom {
     }
 
     @Override
-    public void leave(Output client) {
+    synchronized public void leave(Output client) {
         String pseudo = clients.get(client);
         clients.remove(client);
         broadcast(Message.exit(pseudo));
