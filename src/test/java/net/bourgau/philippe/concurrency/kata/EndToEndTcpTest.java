@@ -20,20 +20,20 @@ public class EndToEndTcpTest extends EndToEndTest {
 
     private ErrorsCatcher errors;
     private TcpChatRoomServer serverChatRoom;
-    private ThreadPoolSpy serverThreadPool;
+    private ExecutorServiceSpy executorService;
 
     @Override
     public void before_each() throws Exception {
         errors = new ErrorsCatcher();
         Errors.override(errors);
 
-        serverThreadPool = newThreadPool();
-        serverChatRoom = TcpChatRoomServer.start(PORT, serverThreadPool);
+        executorService = anExecutorService();
+        serverChatRoom = TcpChatRoomServer.start(PORT, new CachedThreadPool(executorService));
         super.before_each();
     }
 
-    private ThreadPoolSpy newThreadPool() {
-        return new ThreadPoolSpy(new CachedThreadPool(Executors.newCachedThreadPool()));
+    private ExecutorServiceSpy anExecutorService() {
+        return new ExecutorServiceSpy(Executors.newCachedThreadPool());
     }
 
     public void after_each() throws Exception {
@@ -114,7 +114,7 @@ public class EndToEndTcpTest extends EndToEndTest {
         await().until(new Runnable() {
             @Override
             public void run() {
-                assertThat(serverThreadPool.shutDown).isTrue();
+                assertThat(executorService.wasShutDown()).isTrue();
             }
         });
     }
@@ -122,15 +122,15 @@ public class EndToEndTcpTest extends EndToEndTest {
     @Test
     public void
     closing_the_client_interrupts_its_thread() throws Exception {
-        final ThreadPoolSpy clientThread = newThreadPool();
-        final Client jim = new Client("Jim", aClientChatRoom(clientThread), new MemoryOutput());
+        final ExecutorServiceSpy executorServiceSpy = anExecutorService();
+        final Client jim = new Client("Jim", aClientChatRoom(new CachedThreadPool(executorServiceSpy)), new MemoryOutput());
         jim.enter();
         jim.leave();
 
         await().until(new Runnable() {
             @Override
             public void run() {
-                assertThat(clientThread.shutDown).isTrue();
+                assertThat(executorServiceSpy.wasShutDown()).isTrue();
             }
         });
     }
@@ -233,7 +233,7 @@ public class EndToEndTcpTest extends EndToEndTest {
 
     @Override
     protected ChatRoom aClientChatRoom() {
-        return aClientChatRoom(newThreadPool());
+        return aClientChatRoom(new CachedThreadPool(anExecutorService()));
     }
 
     private ChatRoom aClientChatRoom(ThreadPool threadPool) {
