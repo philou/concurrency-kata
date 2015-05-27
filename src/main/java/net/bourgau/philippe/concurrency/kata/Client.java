@@ -1,7 +1,6 @@
 package net.bourgau.philippe.concurrency.kata;
 
-import java.io.IOException;
-import java.util.Scanner;
+import java.util.concurrent.Executors;
 
 public class Client implements Output {
 
@@ -21,7 +20,7 @@ public class Client implements Output {
         entered = true;
     }
 
-    public void announce(String message) throws IOException {
+    public void announce(String message) {
         if (!entered) {
             throw new IllegalStateException("Client cannot write messages after leaving the room.");
         }
@@ -29,7 +28,7 @@ public class Client implements Output {
     }
 
     @Override
-    public void write(String message) throws Exception {
+    public void write(String message) {
         out.write(message);
     }
 
@@ -40,25 +39,16 @@ public class Client implements Output {
     }
 
     public static void main(String[] args) throws Exception {
-        Client client = new Client(args[2], new TcpChatRoomProxy(args[0], Integer.parseInt(args[1]), new CachedThreadPool()), new Output() {
-            public void write(String line) {
-                System.out.println(line);
-            }
-        });
+        Client client = new Client(
+                args[2],
+                new TcpChatRoomProxy(
+                        args[0],
+                        Integer.parseInt(args[1]),
+                        new CachedThreadPool(
+                                Executors.newCachedThreadPool())),
+                Terminal.output());
 
-        try {
-            client.enter();
-
-            Scanner scanner = new Scanner(System.in);
-            while (scanner.hasNextLine()) {
-                String message = scanner.nextLine();
-                if (message.equals("bye")) {
-                    break;
-                }
-                client.announce(message);
-            }
-        } finally {
-            client.leave();
-        }
+        Terminal.startForwardingInputsTo(client);
     }
+
 }

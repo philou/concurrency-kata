@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static net.bourgau.philippe.concurrency.kata.Message.*;
@@ -32,7 +33,7 @@ public class EndToEndTcpTest extends EndToEndTest {
     }
 
     private ThreadPoolSpy newThreadPool() {
-        return new ThreadPoolSpy(new CachedThreadPool());
+        return new ThreadPoolSpy(new CachedThreadPool(Executors.newCachedThreadPool()));
     }
 
     public void after_each() throws Exception {
@@ -75,7 +76,8 @@ public class EndToEndTcpTest extends EndToEndTest {
                     joe.announce("Who is it ?");
                     try {
                         assertThat(sneaker.readMessage()).contains("Who is it ?");
-                    } catch (IOException connectionClosedExecption) {
+                    } catch (IOException connectionClosedException) {
+                        // just exit
                     }
                 }
             });

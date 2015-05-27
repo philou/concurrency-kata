@@ -6,6 +6,8 @@ import java.io.*;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 
+import static net.bourgau.philippe.concurrency.kata.UncheckedThrow.throwUnchecked;
+
 public class TextLineProtocol implements AutoCloseable {
     private final Socket socket;
     private BufferedReader reader;
@@ -18,9 +20,13 @@ public class TextLineProtocol implements AutoCloseable {
         writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
     }
 
-    public void writeMessage(String message) throws IOException {
-        writer.write(message + "\n");
-        writer.flush();
+    public void writeMessage(String message) {
+        try {
+            writer.write(message + "\n");
+            writer.flush();
+        } catch (IOException e) {
+            throwUnchecked(e);
+        }
     }
 
     public String readMessage() throws IOException {

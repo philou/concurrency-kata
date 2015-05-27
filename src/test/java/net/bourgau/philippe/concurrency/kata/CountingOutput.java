@@ -8,7 +8,7 @@ public class CountingOutput implements Output {
     private final List<String> messages = new CopyOnWriteArrayList<>();
 
     @Override
-    public void write(String line) throws Exception {
+    public void write(String line) {
         messages.add(line);
     }
 

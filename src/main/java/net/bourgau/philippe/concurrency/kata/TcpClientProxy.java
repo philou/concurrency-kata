@@ -14,12 +14,12 @@ public class TcpClientProxy extends SafeRunnable implements Output {
     }
 
     @Override
-    public void write(String message) throws Exception {
+    public void write(String message) {
         protocol.writeMessage(message);
     }
 
     @Override
-    protected void unsafeRun() throws IOException {
+    protected void unsafeRun() throws Exception {
         try {
             chatRoom.enter(this, protocol.readMessage());
             while (!Thread.interrupted()) {

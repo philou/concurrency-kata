@@ -1,14 +1,17 @@
 package net.bourgau.philippe.concurrency.kata;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import static net.bourgau.philippe.concurrency.kata.Errors.errors;
 
 public class CachedThreadPool implements ThreadPool {
-    private final ExecutorService threadPool = Executors.newCachedThreadPool();
+    private final ExecutorService threadPool;
+
+    public CachedThreadPool(ExecutorService threadPool) {
+        this.threadPool = threadPool;
+    }
 
     @Override
     public void submit(Runnable runnable) {

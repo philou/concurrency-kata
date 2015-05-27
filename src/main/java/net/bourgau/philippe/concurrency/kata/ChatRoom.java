@@ -1,11 +1,9 @@
 package net.bourgau.philippe.concurrency.kata;
 
-import java.io.IOException;
-
 public interface ChatRoom {
-    void enter(Output client, String pseudo) throws IOException;
+    void enter(Output client, String pseudo);
 
-    void broadcast(Output client, String message) throws IOException;
+    void broadcast(Output client, String message);
 
     void leave(Output client);
 }
