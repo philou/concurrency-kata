@@ -12,15 +12,19 @@ import java.util.concurrent.ExecutorService;
 import static net.bourgau.philippe.concurrency.kata.UncheckedThrow.throwUnchecked;
 
 public class AsynchronousTcpChatRoomProxy implements ChatRoom {
-    final AsynchronousSocketChannel client;
+    private final AsynchronousSocketChannel client;
     private final String host;
     private final int port;
 
-    public AsynchronousTcpChatRoomProxy(String host, int port, ExecutorService threadPool) throws IOException {
-        final AsynchronousChannelGroup asynchronousChannelGroup = AsynchronousChannelGroup.withThreadPool(threadPool);
-        client = AsynchronousSocketChannel.open(asynchronousChannelGroup);
-        this.host = host;
-        this.port = port;
+    public AsynchronousTcpChatRoomProxy(String host, int port, ExecutorService threadPool) {
+        try {
+            final AsynchronousChannelGroup asynchronousChannelGroup = AsynchronousChannelGroup.withThreadPool(threadPool);
+            client = AsynchronousSocketChannel.open(asynchronousChannelGroup);
+            this.host = host;
+            this.port = port;
+        } catch (IOException e) {
+            throw throwUnchecked(e);
+        }
     }
 
     @Override

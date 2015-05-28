@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -17,6 +18,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
 public class EndToEndTcpTest extends EndToEndTest {
 
     public static final int PORT = 1278;
+    public static final String LOCALHOST = "localhost";
 
     private ErrorsCatcher errors;
     private TcpChatRoomServer serverChatRoom;
@@ -123,7 +125,7 @@ public class EndToEndTcpTest extends EndToEndTest {
     public void
     closing_the_client_interrupts_its_thread() throws Exception {
         final ExecutorServiceSpy executorServiceSpy = anExecutorService();
-        final Client jim = new Client("Jim", aClientChatRoom(new CachedThreadPool(executorServiceSpy)), new MemoryOutput());
+        final Client jim = new Client("Jim", aClientChatRoom(executorServiceSpy), new MemoryOutput());
         jim.enter();
         jim.leave();
 
@@ -233,10 +235,11 @@ public class EndToEndTcpTest extends EndToEndTest {
 
     @Override
     protected ChatRoom aClientChatRoom() {
-        return aClientChatRoom(new CachedThreadPool(anExecutorService()));
+        return aClientChatRoom(anExecutorService());
     }
 
-    private ChatRoom aClientChatRoom(ThreadPool threadPool) {
-        return new TcpChatRoomProxy("localhost", PORT, threadPool);
+    protected ChatRoom aClientChatRoom(ExecutorService executorService) {
+        return new TcpChatRoomProxy(LOCALHOST, PORT, new CachedThreadPool(executorService));
     }
+
 }
