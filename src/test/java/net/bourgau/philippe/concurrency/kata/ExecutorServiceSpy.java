@@ -1,18 +1,17 @@
 package net.bourgau.philippe.concurrency.kata;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.*;
 
+import static org.fest.assertions.api.Assertions.assertThat;
+
 public class ExecutorServiceSpy implements ExecutorService {
 
-    public static final ArrayList<String> SHUTDOWN_SEQUENCE = new ArrayList<String>() {
-        {
-            add("shutdown");
-            add("shutdownNow");
-            add("awaitTermination");
-        }
+    public static final String[] SHUTDOWN_SEQUENCE = new String[]{
+            "shutdown",
+            "shutdownNow",
+            "awaitTermination"
     };
 
     private final ExecutorService executorService;
@@ -90,7 +89,12 @@ public class ExecutorServiceSpy implements ExecutorService {
         executorService.execute(runnable);
     }
 
-    public boolean wasShutDown() {
-        return this.shutdownCalls.containsAll(SHUTDOWN_SEQUENCE);
+    Runnable wasShutdown() {
+        return new Runnable() {
+            @Override
+            public void run() {
+                assertThat(shutdownCalls).containsSequence(SHUTDOWN_SEQUENCE);
+            }
+        };
     }
 }

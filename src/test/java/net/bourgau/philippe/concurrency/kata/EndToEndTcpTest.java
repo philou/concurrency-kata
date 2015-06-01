@@ -113,12 +113,7 @@ public class EndToEndTcpTest extends EndToEndTest {
     closing_the_server_interrupts_its_threads() throws Exception {
         serverChatRoom.close();
 
-        await().until(new Runnable() {
-            @Override
-            public void run() {
-                assertThat(executorService.wasShutDown()).isTrue();
-            }
-        });
+        await().until(executorService.wasShutdown());
     }
 
     @Test
@@ -129,12 +124,7 @@ public class EndToEndTcpTest extends EndToEndTest {
         jim.enter();
         jim.leave();
 
-        await().until(new Runnable() {
-            @Override
-            public void run() {
-                assertThat(executorServiceSpy.wasShutDown()).isTrue();
-            }
-        });
+        await().until(executorServiceSpy.wasShutdown());
     }
 
     @Test

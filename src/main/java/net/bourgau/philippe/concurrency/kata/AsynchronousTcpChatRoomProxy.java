@@ -4,14 +4,17 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousChannelGroup;
+import java.nio.channels.AsynchronousCloseException;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.nio.charset.Charset;
 import java.util.concurrent.ExecutorService;
 
+import static net.bourgau.philippe.concurrency.kata.Errors.errors;
 import static net.bourgau.philippe.concurrency.kata.UncheckedThrow.throwUnchecked;
 
 public class AsynchronousTcpChatRoomProxy implements ChatRoom {
+    public static final int END_OF_STREAM_LENGTH = -1;
     private final AsynchronousSocketChannel client;
     private final String host;
     private final int port;
@@ -37,14 +40,24 @@ public class AsynchronousTcpChatRoomProxy implements ChatRoom {
             client.read(destination, null, new CompletionHandler<Integer, Object>() {
                 @Override
                 public void completed(Integer length, Object o) {
-                    output.write(new String(destination.array(), 0, length - 1, Charset.defaultCharset()));
+                    if (length == END_OF_STREAM_LENGTH) {
+                        return;
+                    }
+
+                    String lines = new String(destination.array(), 0, length, Charset.defaultCharset());
+                    for (String line : lines.split("\\n")) {
+                        output.write(line);
+                    }
+
                     destination.clear();
                     client.read(destination, null, this);
                 }
 
                 @Override
                 public void failed(Throwable throwable, Object o) {
-                    throwable.printStackTrace();
+                    if (!(throwable instanceof AsynchronousCloseException)) {
+                        errors().log(throwable);
+                    }
                 }
             });
         } catch (Exception e) {
@@ -62,7 +75,9 @@ public class AsynchronousTcpChatRoomProxy implements ChatRoom {
 
             @Override
             public void failed(Throwable throwable, Object o) {
-                throwable.printStackTrace();
+                if (!(throwable instanceof AsynchronousCloseException)) {
+                    errors().log(throwable);
+                }
             }
         });
     }
@@ -72,8 +87,9 @@ public class AsynchronousTcpChatRoomProxy implements ChatRoom {
         if (this.client.isOpen()) {
             try {
                 this.client.close();
+
             } catch (IOException e) {
-                e.printStackTrace();
+                errors().log(e);
             }
         }
     }

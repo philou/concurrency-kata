@@ -17,5 +17,5 @@ public abstract class Errors {
         errors = new StandardErrors();
     }
 
-    abstract void log(Exception e);
+    abstract void log(Throwable e);
 }

@@ -9,7 +9,7 @@ public class ErrorsCatcher extends Errors {
     private CopyOnWriteArrayList<String> log = new CopyOnWriteArrayList<>();
 
     @Override
-    void log(Exception e) {
+    void log(Throwable e) {
         log.add(ExceptionUtils.getStackTrace(e));
     }
 

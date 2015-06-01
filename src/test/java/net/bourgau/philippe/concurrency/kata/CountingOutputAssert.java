@@ -17,7 +17,4 @@ public class CountingOutputAssert extends AbstractAssert<CountingOutputAssert, C
         Assertions.assertThat(actual.messages()).hasSize(expectedCount);
     }
 
-    public void hasCountDifferentFrom(int expectedCount) {
-        Assertions.assertThat(actual.messages().size()).isNotEqualTo(expectedCount);
-    }
 }
