@@ -1,7 +1,5 @@
 package net.bourgau.philippe.concurrency.kata;
 
-import java.util.concurrent.Executors;
-
 public class Client implements Output {
 
     private final ChatRoom chatRoom;
@@ -36,19 +34,6 @@ public class Client implements Output {
         chatRoom.leave(this);
         write(Message.selfExit());
         entered = false;
-    }
-
-    public static void main(String[] args) throws Exception {
-        Client client = new Client(
-                args[2],
-                new TcpChatRoomProxy(
-                        args[0],
-                        Integer.parseInt(args[1]),
-                        new CachedThreadPool(
-                                Executors.newCachedThreadPool())),
-                Terminal.output());
-
-        Terminal.startForwardingInputsTo(client);
     }
 
 }

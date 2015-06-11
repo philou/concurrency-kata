@@ -12,8 +12,9 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static net.bourgau.philippe.concurrency.kata.Message.*;
 import static org.fest.assertions.api.Assertions.assertThat;
 
-public abstract class EndToEndTest {
+public class EndToEndTest {
 
+    private final ChatRoom chatRoom = new InProcessChatRoom();
     protected Client joe;
     protected Client jack;
     private Output joeOutput;
@@ -33,7 +34,9 @@ public abstract class EndToEndTest {
         jack.leave();
     }
 
-    protected abstract ChatRoom aClientChatRoom();
+    protected ChatRoom aClientChatRoom() {
+        return chatRoom;
+    }
 
     @Test
     public void
