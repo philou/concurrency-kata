@@ -5,6 +5,7 @@ import org.apache.commons.io.IOUtils;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.RejectedExecutionException;
 
 public class TcpChatRoomServer extends SafeRunnable implements AutoCloseable {
 
@@ -27,7 +28,9 @@ public class TcpChatRoomServer extends SafeRunnable implements AutoCloseable {
                 threadPool.submit(clientProxy);
             }
         } catch (IOException connectionClosedException) {
-            // just exit
+            // socket closed, just exit
+        } catch (RejectedExecutionException closing) {
+            // thread pool shuting down, just exit
         }
     }
 

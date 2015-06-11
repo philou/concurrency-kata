@@ -55,9 +55,11 @@ public class AsynchronousTcpChatRoomProxy implements ChatRoom {
 
                 @Override
                 public void failed(Throwable throwable, Object o) {
-                    if (!(throwable instanceof AsynchronousCloseException)) {
-                        errors().log(throwable);
+                    if (throwable instanceof IOException) {
+                        // socket closed
+                        return;
                     }
+                    errors().log(throwable);
                 }
             });
         } catch (Exception e) {
@@ -75,9 +77,11 @@ public class AsynchronousTcpChatRoomProxy implements ChatRoom {
 
             @Override
             public void failed(Throwable throwable, Object o) {
-                if (!(throwable instanceof AsynchronousCloseException)) {
-                    errors().log(throwable);
+                if (throwable instanceof AsynchronousCloseException) {
+                    // socket closed
+                    return;
                 }
+                errors().log(throwable);
             }
         });
     }

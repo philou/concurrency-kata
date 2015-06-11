@@ -19,7 +19,7 @@ public class InProcessChatRoom implements ChatRoom {
     }
 
     private void broadcast(String message) {
-        for (Output client : clients.keySet()) {
+        for (Output client : new HashMap<>(clients).keySet()) {
             safeWrite(client, message);
         }
     }
