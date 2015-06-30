@@ -36,7 +36,7 @@ public class BenchmarkTest {
     @BeforeClass
     public static void before_all() throws Exception {
         output = new BufferedWriter(new OutputStreamWriter(System.out));
-        output.write("clients,incoming messages,outgoing messages,duration(seconds),outgoing throughput(message/second)\n");
+        output.write("clients,incoming messages,outgoing messages,duration(seconds),scenario, outgoing throughput(message/second)\n");
         output.flush();
         Thread.sleep(500);
     }
@@ -62,8 +62,8 @@ public class BenchmarkTest {
 
         double duration = (System.currentTimeMillis() - startMillis) / 1000.;
         int outgoingMessages = clientCount * messagePerClientCount * clientCount;
-        output.write(String.format("%s,%s,%s,%s,%s\n", clientCount, messagePerClientCount, outgoingMessages,
-                duration, outgoingMessages / duration));
+        output.write(String.format("%s,%s,%s,%s,%s x %s,%s\n", clientCount, messagePerClientCount, outgoingMessages,
+                duration, clientCount, messagePerClientCount, outgoingMessages / duration));
     }
 
     @After

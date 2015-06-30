@@ -23,3 +23,6 @@ hs_err_pid*
 
 # maven files
 target
+
+# temp files
+*#
