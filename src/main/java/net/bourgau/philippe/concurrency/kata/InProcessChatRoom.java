@@ -8,13 +8,13 @@ public class InProcessChatRoom implements ChatRoom {
     private final Map<Output, String> clients = new HashMap<>();
 
     @Override
-    synchronized public void enter(Output client, String pseudo) {
+    public void enter(Output client, String pseudo) {
         clients.put(client, pseudo);
         broadcast(Message.welcome(pseudo));
     }
 
     @Override
-    synchronized public void broadcast(Output client, String message) {
+    public void broadcast(Output client, String message) {
         broadcast(Message.signed(clients.get(client), message));
     }
 
@@ -33,7 +33,7 @@ public class InProcessChatRoom implements ChatRoom {
     }
 
     @Override
-    synchronized public void leave(Output client) {
+    public void leave(Output client) {
         String pseudo = clients.get(client);
         clients.remove(client);
         broadcast(Message.exit(pseudo));
