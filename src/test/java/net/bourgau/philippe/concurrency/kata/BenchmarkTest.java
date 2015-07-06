@@ -30,7 +30,7 @@ public class BenchmarkTest {
     @Parameterized.Parameter(1)
     public int messagePerClientCount;
 
-    private final ChatRoom chatRoom = new InProcessChatRoom();
+    private final ChatRoom chatRoom = ChatRoomFactory.createChatRoom();
     private List<Client> clients = new ArrayList<>();
 
     @BeforeClass

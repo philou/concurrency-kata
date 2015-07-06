@@ -7,6 +7,9 @@ public class InProcessChatRoom implements ChatRoom {
 
     private final Map<Output, String> clients = new HashMap<>();
 
+    InProcessChatRoom() {
+    }
+
     @Override
     public synchronized void enter(Output client, String pseudo) {
         clients.put(client, pseudo);

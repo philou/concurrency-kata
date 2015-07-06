@@ -14,7 +14,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 public class EndToEndTest {
 
-    private final ChatRoom chatRoom = new InProcessChatRoom();
+    private final ChatRoom chatRoom = ChatRoomFactory.createChatRoom();
     protected Client joe;
     protected Client jack;
     private Output joeOutput;

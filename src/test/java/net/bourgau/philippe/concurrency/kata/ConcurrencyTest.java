@@ -18,33 +18,47 @@ public class ConcurrencyTest {
     private List<Thread> clientThreads;
     private CountDownLatch startLatch;
     private CountingOutput countingOutput;
+    private Client observer;
 
     @Before
     public void setUp() throws Exception {
-        chatRoom = new InProcessChatRoom();
+        chatRoom = ChatRoomFactory.createChatRoom();
         clientThreads = new ArrayList<>();
         startLatch = new CountDownLatch(1);
         countingOutput = new CountingOutput();
+        observer = new Client("Observer", chatRoom, countingOutput);
     }
 
     @Test
     public void it_should_handle_many_clients_concurrently() throws Exception {
-        Client observer = new Client("Observer", chatRoom, countingOutput);
-        observer.enter();
-        countingOutput.reset();
+        enterObserver();
 
         for (int i = 0; i < NB_CLIENTS; i++) {
-            clientThreads.add(new Thread(new EnterQuit(new Client("Client#" + i, chatRoom, new NullOutput()))));
+            clientThreads.add(new Thread(new EnterQuit(newClient(i))));
         }
 
         runClientThreads();
 
-        await().atMost(FIVE_SECONDS).until(new Runnable() {
+        await().atMost(FIVE_SECONDS).until(messageCountIs(NB_CLIENTS * 3));
+    }
+
+    private void enterObserver() throws Exception {
+        observer.enter();
+        await().until(messageCountIs(1));
+        countingOutput.reset();
+    }
+
+    private Client newClient(int i) {
+        return new Client("Client#" + i, chatRoom, new NullOutput());
+    }
+
+    private Runnable messageCountIs(final int expectedMessageCount) {
+        return new Runnable() {
             @Override
             public void run() {
-                countingOutput.assertMessageCount().isEqualTo(NB_CLIENTS * 3);
+                countingOutput.assertMessageCount().isEqualTo(expectedMessageCount);
             }
-        });
+        };
     }
 
     private void runClientThreads() throws InterruptedException {
