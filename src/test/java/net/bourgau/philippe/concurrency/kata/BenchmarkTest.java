@@ -51,7 +51,7 @@ public class BenchmarkTest {
         }
     }
 
-    @Test(timeout = 15000)
+    @Test(timeout = 30000)
     public void benchmark() throws Exception {
         long startMillis = System.currentTimeMillis();
 
@@ -81,6 +81,6 @@ public class BenchmarkTest {
     }
 
     private void shutdown() throws InterruptedException {
-        chatRoom.shutdownAndAwaitTermination(7, TimeUnit.SECONDS);
+        chatRoom.shutdownAndAwaitTermination(15, TimeUnit.SECONDS);
     }
 }

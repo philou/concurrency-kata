@@ -2,22 +2,23 @@ package net.bourgau.philippe.concurrency.kata;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class InProcessChatRoom implements ChatRoom {
 
-    private final Map<Output, String> clients = new HashMap<>();
+    private final Map<Output, String> clients = new ConcurrentHashMap<>();
 
     InProcessChatRoom() {
     }
 
     @Override
-    public synchronized void enter(Output client, String pseudo) {
+    public void enter(Output client, String pseudo) {
         clients.put(client, pseudo);
         broadcast(Message.welcome(pseudo));
     }
 
     @Override
-    public synchronized void broadcast(Output client, String message) {
+    public void broadcast(Output client, String message) {
         broadcast(Message.signed(clients.get(client), message));
     }
 
@@ -36,7 +37,7 @@ public class InProcessChatRoom implements ChatRoom {
     }
 
     @Override
-    public synchronized void leave(Output client) {
+    public void leave(Output client) {
         String pseudo = clients.get(client);
         clients.remove(client);
         broadcast(Message.exit(pseudo));
