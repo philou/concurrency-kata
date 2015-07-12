@@ -9,6 +9,7 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @RunWith(Parameterized.class)
 public class BenchmarkTest {
@@ -18,10 +19,10 @@ public class BenchmarkTest {
     @Parameterized.Parameters(name = "{0} clients each sending {1} messages")
     public static Collection<Object[]> parameters() {
         ArrayList<Object[]> parameters = new ArrayList<>();
-        parameters.add(new Object[]{1, 10000000});
-        parameters.add(new Object[]{10, 100000});
-        parameters.add(new Object[]{100, 1000});
         parameters.add(new Object[]{1000, 10});
+        parameters.add(new Object[]{100, 1000});
+        parameters.add(new Object[]{10, 100000});
+        parameters.add(new Object[]{1, 10000000});
         return parameters;
     }
 
@@ -30,7 +31,7 @@ public class BenchmarkTest {
     @Parameterized.Parameter(1)
     public int messagePerClientCount;
 
-    private final ChatRoom chatRoom = ChatRoomFactory.createChatRoom();
+    private final ConcurrentChatRoom chatRoom = ChatRoomFactory.createChatRoom();
     private List<Client> clients = new ArrayList<>();
 
     @BeforeClass
@@ -50,7 +51,7 @@ public class BenchmarkTest {
         }
     }
 
-    @Test
+    @Test(timeout = 15000)
     public void benchmark() throws Exception {
         long startMillis = System.currentTimeMillis();
 
@@ -60,6 +61,8 @@ public class BenchmarkTest {
             }
         }
 
+        shutdown();
+
         double duration = (System.currentTimeMillis() - startMillis) / 1000.;
         int outgoingMessages = clientCount * messagePerClientCount * clientCount;
         output.write(String.format("%s,%s,%s,%s,%s x %s,%s\n", clientCount, messagePerClientCount, outgoingMessages,
@@ -68,14 +71,16 @@ public class BenchmarkTest {
 
     @After
     public void after_each() throws Exception {
-        for (Client client : clients) {
-            client.leave();
-        }
+        shutdown();
         output.flush();
     }
 
     @AfterClass
     public static void after_all() throws Exception {
         output.close();
+    }
+
+    private void shutdown() throws InterruptedException {
+        chatRoom.shutdownAndAwaitTermination(7, TimeUnit.SECONDS);
     }
 }

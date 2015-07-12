@@ -1,6 +1,7 @@
 package net.bourgau.philippe.concurrency.kata;
 
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class ConcurrentChatRoom implements ChatRoom {
 
@@ -40,5 +41,22 @@ public class ConcurrentChatRoom implements ChatRoom {
                 realChatroom.leave(client);
             }
         });
+    }
+
+    public void shutdownAndAwaitTermination(int count, TimeUnit timeUnit) throws InterruptedException {
+        threadPool.shutdown();
+        try {
+            if (!threadPool.awaitTermination(count, timeUnit)) {
+                threadPool.shutdownNow();
+                if (!threadPool.awaitTermination(count, timeUnit)) {
+                    throw new RuntimeException("Pool did not terminate");
+                }
+            }
+
+        } catch (InterruptedException ie) {
+            threadPool.shutdownNow();
+            Thread.currentThread().interrupt();
+            throw ie;
+        }
     }
 }
