@@ -14,16 +14,18 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 public class EndToEndTest {
 
-    private final ChatRoom chatRoom = ChatRoomFactory.createChatRoom();
+    private final Factory factory = new Factory();
+    private ChatRoom chatRoom;
     protected Client joe;
     protected Client jack;
     private Output joeOutput;
 
     @Before
     public void before_each() throws Exception {
+        chatRoom = factory.createChatRoom();
         joeOutput = new MemoryOutput();
-        joe = new Client("Joe", aClientChatRoom(), joeOutput);
-        jack = new Client("Jack", aClientChatRoom(), new MemoryOutput());
+        joe = factory.createClient("Joe", aClientChatRoom(), joeOutput);
+        jack = factory.createClient("Jack", aClientChatRoom(), new MemoryOutput());
 
         joe.enter();
     }

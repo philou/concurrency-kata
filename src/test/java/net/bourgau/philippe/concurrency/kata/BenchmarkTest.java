@@ -15,7 +15,6 @@ import java.util.concurrent.TimeUnit;
 public class BenchmarkTest {
 
     private static BufferedWriter output;
-
     @Parameterized.Parameters(name = "{0} clients each sending {1} messages")
     public static Collection<Object[]> parameters() {
         ArrayList<Object[]> parameters = new ArrayList<>();
@@ -28,10 +27,14 @@ public class BenchmarkTest {
 
     @Parameterized.Parameter(0)
     public int clientCount;
+
     @Parameterized.Parameter(1)
     public int messagePerClientCount;
 
-    private final ConcurrentChatRoom chatRoom = ChatRoomFactory.createChatRoom();
+    private final Factory factory = new Factory();
+
+    private ConcurrentChatRoom chatRoom;
+
     private List<Client> clients = new ArrayList<>();
 
     @BeforeClass
@@ -44,8 +47,10 @@ public class BenchmarkTest {
 
     @Before
     public void before_each() throws Exception {
+        chatRoom = factory.createChatRoom();
+
         for (int i = 0; i < clientCount; i++) {
-            Client client = new Client("Client#" + i, chatRoom, new NullOutput());
+            Client client = factory.createClient("Client#" + i, chatRoom, new NullOutput());
             client.enter();
             clients.add(client);
         }
@@ -81,6 +86,6 @@ public class BenchmarkTest {
     }
 
     private void shutdown() throws InterruptedException {
-        chatRoom.shutdownAndAwaitTermination(15, TimeUnit.SECONDS);
+        factory.shutdownAndAwaitTermination(15, TimeUnit.SECONDS);
     }
 }

@@ -1,5 +1,6 @@
 package net.bourgau.philippe.concurrency.kata;
 
+import com.jayway.awaitility.Duration;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -8,25 +9,21 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import static com.jayway.awaitility.Awaitility.await;
-import static com.jayway.awaitility.Duration.FIVE_SECONDS;
 
 public class ConcurrencyTest {
 
     private static final int NB_CLIENTS = 500;
 
-    private ChatRoom chatRoom;
-    private List<Thread> clientThreads;
-    private CountDownLatch startLatch;
-    private CountingOutput countingOutput;
+    private Factory factory = new Factory();
+    private ChatRoom chatRoom = factory.createChatRoom();
+    private List<Thread> clientThreads = new ArrayList<>();
+    private CountDownLatch startLatch = new CountDownLatch(1);
+    private CountingOutput countingOutput = new CountingOutput();
     private Client observer;
 
     @Before
     public void setUp() throws Exception {
-        chatRoom = ChatRoomFactory.createChatRoom();
-        clientThreads = new ArrayList<>();
-        startLatch = new CountDownLatch(1);
-        countingOutput = new CountingOutput();
-        observer = new Client("Observer", chatRoom, countingOutput);
+        observer = factory.createClient("Observer", chatRoom, countingOutput);
     }
 
     @Test
@@ -39,7 +36,7 @@ public class ConcurrencyTest {
 
         runClientThreads();
 
-        await().atMost(FIVE_SECONDS).until(messageCountIs(NB_CLIENTS * 3));
+        await().atMost(Duration.TEN_SECONDS).until(messageCountIs(NB_CLIENTS * 3));
     }
 
     private void enterObserver() throws Exception {
@@ -49,7 +46,7 @@ public class ConcurrencyTest {
     }
 
     private Client newClient(int i) {
-        return new Client("Client#" + i, chatRoom, new NullOutput());
+        return factory.createClient("Client#" + i, chatRoom, new NullOutput());
     }
 
     private Runnable messageCountIs(final int expectedMessageCount) {
