@@ -1,7 +1,5 @@
 package net.bourgau.philippe.concurrency.kata;
 
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -9,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 public final class Factory {
 
     private final ExecutorService chatRoomThreadPool = Executors.newFixedThreadPool(1);
-    private final List<ExecutorService> clientsThreadPools = new CopyOnWriteArrayList<>();
+    private final ExecutorService clientsThreadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1);
 
     public ConcurrentChatRoom createChatRoom() {
         return new ConcurrentChatRoom(
@@ -18,17 +16,13 @@ public final class Factory {
     }
 
     public ConcurrentClient createClient(String name, ChatRoom chatRoom, Output out) {
-        ExecutorService threadPool = Executors.newFixedThreadPool(1);
-        clientsThreadPools.add(threadPool);
         return new ConcurrentClient(
                 new RealClient(name, chatRoom, out),
-                threadPool);
+                clientsThreadPool);
     }
 
     public void shutdownAndAwaitTermination(int count, TimeUnit timeUnit) throws InterruptedException {
-        for (ExecutorService threadPool : clientsThreadPools) {
-            shutdownThreadPool(threadPool, count, timeUnit);
-        }
+        shutdownThreadPool(clientsThreadPool, count, timeUnit);
         shutdownThreadPool(chatRoomThreadPool, count, timeUnit);
     }
 

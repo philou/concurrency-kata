@@ -28,12 +28,15 @@ public class EndToEndTest {
         jack = factory.createClient("Jack", aClientChatRoom(), new MemoryOutput());
 
         joe.enter();
+
+        joeShouldReceive(welcome("Joe"));
     }
 
     @After
     public void after_each() throws Exception {
         joe.leave();
         jack.leave();
+
     }
 
     protected ChatRoom aClientChatRoom() {
@@ -88,12 +91,18 @@ public class EndToEndTest {
         joeShouldReceive(exit("Jack"));
     }
 
-    @Test(expected = Exception.class)
+    @Test(expected = ConditionTimeoutException.class)
     public void
     a_client_cannot_write_after_it_left() throws Exception {
-        joe.leave();
+        jack.enter();
+        joeShouldReceive(welcome("Jack"));
 
-        joe.announce("Hello ?");
+        jack.leave();
+        joeShouldReceive(exit("Jack"));
+
+        jack.announce("All alone now ...");
+
+        joeShouldReceive(signed("Jack", "Are alone now ..."));
     }
 
     @Test(expected = ConditionTimeoutException.class)

@@ -1,20 +1,40 @@
 package net.bourgau.philippe.concurrency.kata;
 
 
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 
-public class ConcurrentClient implements Client {
+public class ConcurrentClient implements Client, Runnable {
     private final RealClient realClient;
     private final ExecutorService threadPool;
+    private final ConcurrentLinkedQueue<Runnable> mailbox = new ConcurrentLinkedQueue<>();
+    private boolean left;
 
     public ConcurrentClient(RealClient realClient, ExecutorService threadPool) {
         this.realClient = realClient;
         this.threadPool = threadPool;
+        submitContinuation();
+    }
+
+    private void submitContinuation() {
+        threadPool.submit(this);
+    }
+
+    public void run() {
+        if (left) {
+            return;
+        }
+
+        Runnable nextMessage = mailbox.poll();
+        if (nextMessage != null) {
+            nextMessage.run();
+        }
+        submitContinuation();
     }
 
     @Override
     public void enter() throws Exception {
-        threadPool.submit(new UnsafeRunnable() {
+        mailbox.add(new UnsafeRunnable() {
             @Override
             public void doRun() throws Exception {
                 realClient.enter();
@@ -24,7 +44,7 @@ public class ConcurrentClient implements Client {
 
     @Override
     public void announce(final String message) {
-        threadPool.submit(new UnsafeRunnable() {
+        mailbox.add(new UnsafeRunnable() {
             @Override
             public void doRun() throws Exception {
                 realClient.announce(message);
@@ -34,17 +54,19 @@ public class ConcurrentClient implements Client {
 
     @Override
     public void leave() throws Exception {
-        threadPool.submit(new UnsafeRunnable() {
+        mailbox.add(new UnsafeRunnable() {
             @Override
             public void doRun() throws Exception {
+                left = true;
                 realClient.leave();
+
             }
         });
     }
 
     @Override
     public void write(final String line) {
-        threadPool.submit(new UnsafeRunnable() {
+        mailbox.add(new UnsafeRunnable() {
             @Override
             public void doRun() throws Exception {
                 realClient.write(line);
