@@ -6,38 +6,32 @@ import java.util.concurrent.TimeUnit;
 
 public final class Factory {
 
-    private final ExecutorService chatRoomThreadPool = Executors.newFixedThreadPool(1);
-    private final ExecutorService clientsThreadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1);
+    private final ExecutorService clientsThreadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     public ConcurrentChatRoom createChatRoom() {
         return new ConcurrentChatRoom(
                 new InProcessChatRoom(),
-                Executors.newFixedThreadPool(1));
+                clientsThreadPool);
     }
 
-    public ConcurrentClient createClient(String name, ChatRoom chatRoom, Output out) {
+    public Client createClient(String name, ChatRoom chatRoom, Output out) {
         return new ConcurrentClient(
                 new RealClient(name, chatRoom, out),
                 clientsThreadPool);
     }
 
     public void shutdownAndAwaitTermination(int count, TimeUnit timeUnit) throws InterruptedException {
-        shutdownThreadPool(clientsThreadPool, count, timeUnit);
-        shutdownThreadPool(chatRoomThreadPool, count, timeUnit);
-    }
-
-    private static void shutdownThreadPool(ExecutorService threadPool, int count, TimeUnit timeUnit) throws InterruptedException {
-        threadPool.shutdown();
+        clientsThreadPool.shutdown();
         try {
-            if (!threadPool.awaitTermination(count, timeUnit)) {
-                threadPool.shutdownNow();
-                if (!threadPool.awaitTermination(count, timeUnit)) {
+            if (!clientsThreadPool.awaitTermination(count, timeUnit)) {
+                clientsThreadPool.shutdownNow();
+                if (!clientsThreadPool.awaitTermination(count, timeUnit)) {
                     throw new RuntimeException("Pool did not terminate");
                 }
             }
 
         } catch (InterruptedException ie) {
-            threadPool.shutdownNow();
+            clientsThreadPool.shutdownNow();
             Thread.currentThread().interrupt();
             throw ie;
         }
