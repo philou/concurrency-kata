@@ -3,13 +3,11 @@ package net.bourgau.philippe.concurrency.kata;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 
-/**
- * Created by vagrant on 7/14/15.
- */
 public class Actor implements Runnable {
-    protected final ExecutorService threadPool;
+
+    private final ExecutorService threadPool;
     private final ConcurrentLinkedQueue<Runnable> mailbox = new ConcurrentLinkedQueue<>();
-    private boolean shutdown;
+    private volatile boolean shutdown;
 
     public Actor(ExecutorService threadPool) {
         this.threadPool = threadPool;
@@ -17,10 +15,6 @@ public class Actor implements Runnable {
 
     protected void start() {
         submitContinuation();
-    }
-
-    private void submitContinuation() {
-        threadPool.submit(this);
     }
 
     public void run() {
@@ -32,7 +26,11 @@ public class Actor implements Runnable {
         if (nextMessage != null) {
             nextMessage.run();
         }
-        start();
+        submitContinuation();
+    }
+
+    private void submitContinuation() {
+        threadPool.submit(this);
     }
 
     protected void shutdown() {
