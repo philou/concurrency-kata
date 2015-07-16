@@ -35,7 +35,7 @@ public class RealClient implements Client {
     @Override
     public void leave() throws Exception {
         chatRoom.leave(this);
-        write(Message.selfExit());
+        write(Messages.selfExit());
         entered = false;
     }
 }

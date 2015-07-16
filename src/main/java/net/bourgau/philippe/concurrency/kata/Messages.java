@@ -1,6 +1,6 @@
 package net.bourgau.philippe.concurrency.kata;
 
-public final class Message {
+public final class Messages {
     public static String welcome(String pseudo) {
         return String.format("Welcome %s !", pseudo);
     }

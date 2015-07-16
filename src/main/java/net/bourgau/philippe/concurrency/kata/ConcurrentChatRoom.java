@@ -1,8 +1,10 @@
 package net.bourgau.philippe.concurrency.kata;
 
+import net.bourgau.philippe.concurrency.kata.actors.Actor;
+
 import java.util.concurrent.ExecutorService;
 
-public class ConcurrentChatRoom extends Actor implements ChatRoom {
+public class ConcurrentChatRoom extends Actor<Runnable> implements ChatRoom {
 
     private final ChatRoom realChatroom;
 
@@ -14,7 +16,7 @@ public class ConcurrentChatRoom extends Actor implements ChatRoom {
 
     @Override
     public void enter(final Output client, final String pseudo) {
-        message(new Runnable() {
+        send(new Runnable() {
             @Override
             public void run() {
                 realChatroom.enter(client, pseudo);
@@ -24,7 +26,7 @@ public class ConcurrentChatRoom extends Actor implements ChatRoom {
 
     @Override
     public void broadcast(final Output client, final String message) {
-        message(new Runnable() {
+        send(new Runnable() {
             @Override
             public void run() {
                 realChatroom.broadcast(client, message);
@@ -34,11 +36,16 @@ public class ConcurrentChatRoom extends Actor implements ChatRoom {
 
     @Override
     public void leave(final Output client) {
-        message(new Runnable() {
+        send(new Runnable() {
             @Override
             public void run() {
                 realChatroom.leave(client);
             }
         });
+    }
+
+    @Override
+    protected void handle(Runnable nextMessage) {
+        nextMessage.run();
     }
 }

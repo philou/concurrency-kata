@@ -9,7 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static net.bourgau.philippe.concurrency.kata.Message.*;
+import static net.bourgau.philippe.concurrency.kata.Messages.*;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 public class EndToEndTest {
@@ -109,8 +109,11 @@ public class EndToEndTest {
     public void
     a_client_no_longer_receives_messages_after_it_left() throws Exception {
         jack.enter();
+        joeShouldReceive(exit("Jack"));
 
         joe.leave();
+        joeShouldReceive(selfExit());
+
         jack.announce("Are you there ?");
 
         joeShouldReceive(signed("Jack", "Are you there ?"));

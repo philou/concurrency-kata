@@ -13,12 +13,12 @@ public class InProcessChatRoom implements ChatRoom {
     @Override
     public void enter(Output client, String pseudo) {
         clients.put(client, pseudo);
-        broadcast(Message.welcome(pseudo));
+        broadcast(Messages.welcome(pseudo));
     }
 
     @Override
     public void broadcast(Output client, String message) {
-        broadcast(Message.signed(clients.get(client), message));
+        broadcast(Messages.signed(clients.get(client), message));
     }
 
     private void broadcast(String message) {
@@ -39,6 +39,6 @@ public class InProcessChatRoom implements ChatRoom {
     public void leave(Output client) {
         String pseudo = clients.get(client);
         clients.remove(client);
-        broadcast(Message.exit(pseudo));
+        broadcast(Messages.exit(pseudo));
     }
 }

@@ -6,6 +6,14 @@ import java.util.concurrent.TimeUnit;
 
 public final class Factory {
 
+    /*
+    Ideas for refactorings :
+     - try to use real value messages instead of Runnables ?
+     - transform code around the ConcurrentQueue and make it a first class CSP queue, with async methods
+     - try to inline the InProcess classes ?
+     - extract the Coroutine interface, which would be a 'Callable<Callable<...>>'
+     */
+
     private final ExecutorService clientsThreadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     public ConcurrentChatRoom createChatRoom() {
