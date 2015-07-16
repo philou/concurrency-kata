@@ -109,8 +109,11 @@ public class EndToEndTest {
     public void
     a_client_no_longer_receives_messages_after_it_left() throws Exception {
         jack.enter();
+        joeShouldReceive(welcome("Jack"));
 
         joe.leave();
+        joeShouldReceive(selfExit());
+
         jack.announce("Are you there ?");
 
         joeShouldReceive(signed("Jack", "Are you there ?"));
