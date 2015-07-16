@@ -51,7 +51,7 @@ public class BenchmarkTest {
         }
     }
 
-    @Test(timeout = 15000)
+    @Test(timeout = 60000)
     public void benchmark() throws Exception {
         long startMillis = System.currentTimeMillis();
 
@@ -61,7 +61,7 @@ public class BenchmarkTest {
             }
         }
 
-        shutdown();
+        shutdown(50000);
 
         double duration = (System.currentTimeMillis() - startMillis) / 1000.;
         int outgoingMessages = clientCount * messagePerClientCount * clientCount;
@@ -71,7 +71,7 @@ public class BenchmarkTest {
 
     @After
     public void after_each() throws Exception {
-        shutdown();
+        shutdown(100);
         output.flush();
     }
 
@@ -80,7 +80,7 @@ public class BenchmarkTest {
         output.close();
     }
 
-    private void shutdown() throws InterruptedException {
-        chatRoom.shutdownAndAwaitTermination(7, TimeUnit.SECONDS);
+    private void shutdown(int millis) throws InterruptedException {
+        chatRoom.awaitOrShutdown(millis, TimeUnit.MILLISECONDS);
     }
 }

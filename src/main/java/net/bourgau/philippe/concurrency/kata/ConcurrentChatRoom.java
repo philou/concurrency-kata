@@ -43,13 +43,23 @@ public class ConcurrentChatRoom implements ChatRoom {
         });
     }
 
-    public void shutdownAndAwaitTermination(int count, TimeUnit timeUnit) throws InterruptedException {
-        threadPool.shutdown();
+    public void awaitOrShutdown(int count, TimeUnit timeUnit) throws InterruptedException {
         try {
             if (!threadPool.awaitTermination(count, timeUnit)) {
+                throw new RuntimeException("All tasks could not be executed");
+            }
+        } finally {
+            shutdown();
+        }
+    }
+
+    private void shutdown() throws InterruptedException {
+        threadPool.shutdown();
+        try {
+            if (!threadPool.awaitTermination(500, TimeUnit.MILLISECONDS)) {
                 threadPool.shutdownNow();
-                if (!threadPool.awaitTermination(count, timeUnit)) {
-                    throw new RuntimeException("Pool did not terminate");
+                if (!threadPool.awaitTermination(500, TimeUnit.MILLISECONDS)) {
+                    throw new RuntimeException("Failed to force stop the thread pool");
                 }
             }
 
