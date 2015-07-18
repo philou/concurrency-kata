@@ -13,15 +13,16 @@ import java.util.List;
 @RunWith(Parameterized.class)
 public class BenchmarkTest {
 
-    private static BufferedWriter output;
+    private static BufferedWriter stdOutput;
 
     @Parameterized.Parameters(name = "{0} clients each sending {1} messages")
     public static Collection<Object[]> parameters() {
         ArrayList<Object[]> parameters = new ArrayList<>();
-        parameters.add(new Object[]{1, 10000000});
-        parameters.add(new Object[]{10, 100000});
-        parameters.add(new Object[]{100, 1000});
+        parameters.add(new Object[]{10, 10});
         parameters.add(new Object[]{1000, 10});
+        parameters.add(new Object[]{100, 1000});
+        parameters.add(new Object[]{10, 100000});
+        parameters.add(new Object[]{1, 10000000});
         return parameters;
     }
 
@@ -32,19 +33,19 @@ public class BenchmarkTest {
 
     private final ChatRoom chatRoom = new InProcessChatRoom();
     private List<Client> clients = new ArrayList<>();
+    private Output messageOutput = new NullOutput();
 
     @BeforeClass
     public static void before_all() throws Exception {
-        output = new BufferedWriter(new OutputStreamWriter(System.out));
-        output.write("clients,incoming messages,outgoing messages,duration(seconds),scenario, outgoing throughput(message/second)\n");
-        output.flush();
-        Thread.sleep(500);
+        stdOutput = new BufferedWriter(new OutputStreamWriter(System.out));
+        stdOutput.write("scenario, outgoing throughput(message/second)\n");
+        stdOutput.flush();
     }
 
     @Before
     public void before_each() throws Exception {
         for (int i = 0; i < clientCount; i++) {
-            Client client = new Client("Client#" + i, chatRoom, new NullOutput());
+            Client client = new Client("Client#" + i, chatRoom, messageOutput);
             client.enter();
             clients.add(client);
         }
@@ -62,8 +63,7 @@ public class BenchmarkTest {
 
         double duration = (System.currentTimeMillis() - startMillis) / 1000.;
         int outgoingMessages = clientCount * messagePerClientCount * clientCount;
-        output.write(String.format("%s,%s,%s,%s,%s x %s,%s\n", clientCount, messagePerClientCount, outgoingMessages,
-                duration, clientCount, messagePerClientCount, outgoingMessages / duration));
+        stdOutput.write(String.format("%s x %s,%s\n", clientCount, messagePerClientCount, outgoingMessages / duration));
     }
 
     @After
@@ -71,11 +71,11 @@ public class BenchmarkTest {
         for (Client client : clients) {
             client.leave();
         }
-        output.flush();
+        stdOutput.flush();
     }
 
     @AfterClass
     public static void after_all() throws Exception {
-        output.close();
+        stdOutput.close();
     }
 }
