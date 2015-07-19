@@ -1,5 +1,6 @@
 package net.bourgau.philippe.concurrency.kata;
 
+import net.bourgau.philippe.concurrency.kata.common.Output;
 import org.fest.assertions.api.Assertions;
 import org.fest.assertions.api.IntegerAssert;
 

@@ -1,4 +1,4 @@
-package net.bourgau.philippe.concurrency.kata;
+package net.bourgau.philippe.concurrency.kata.common;
 
 public final class Message {
     public static String welcome(String pseudo) {
@@ -9,7 +9,7 @@ public final class Message {
         return String.format("%s > %s", name, message);
     }
 
-    static String exit(String name) {
+    public static String exit(String name) {
         return String.format("%s left", name);
     }
 

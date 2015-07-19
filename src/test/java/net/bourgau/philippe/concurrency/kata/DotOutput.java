@@ -1,12 +1,15 @@
 package net.bourgau.philippe.concurrency.kata;
 
+import net.bourgau.philippe.concurrency.kata.common.Output;
+
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class DotOutput implements Output {
-    int count = 0;
+    private AtomicInteger count = new AtomicInteger();
 
     @Override
     public void write(String line) {
-        count++;
-        if (count % 10000 == 0) {
+        if (count.incrementAndGet() % 10000 == 0) {
             System.out.print(".");
         }
     }

@@ -1,4 +1,4 @@
-package net.bourgau.philippe.concurrency.kata;
+package net.bourgau.philippe.concurrency.kata.common;
 
 public class Client implements Output {
 

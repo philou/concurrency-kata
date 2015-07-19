@@ -1,5 +1,7 @@
 package net.bourgau.philippe.concurrency.kata;
 
+import net.bourgau.philippe.concurrency.kata.common.Output;
+
 public class MemoryOutput implements Output {
 
     private final StringBuilder text;

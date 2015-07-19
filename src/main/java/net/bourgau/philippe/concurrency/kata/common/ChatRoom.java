@@ -1,4 +1,4 @@
-package net.bourgau.philippe.concurrency.kata;
+package net.bourgau.philippe.concurrency.kata.common;
 
 public interface ChatRoom {
     void enter(Output client, String pseudo);

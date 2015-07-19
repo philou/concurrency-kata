@@ -3,27 +3,45 @@ package net.bourgau.philippe.concurrency.kata;
 import com.jayway.awaitility.Awaitility;
 import com.jayway.awaitility.core.ConditionFactory;
 import com.jayway.awaitility.core.ConditionTimeoutException;
+import net.bourgau.philippe.concurrency.kata.common.ChatRoom;
+import net.bourgau.philippe.concurrency.kata.common.Client;
+import net.bourgau.philippe.concurrency.kata.common.Implementation;
+import net.bourgau.philippe.concurrency.kata.common.Output;
 import org.fest.assertions.api.StringAssert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+
+import java.util.Collection;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static net.bourgau.philippe.concurrency.kata.Message.*;
+import static net.bourgau.philippe.concurrency.kata.common.Message.*;
 import static org.fest.assertions.api.Assertions.assertThat;
 
+@RunWith(Parameterized.class)
 public class EndToEndTest {
 
-    private final ChatRoom chatRoom = new InProcessChatRoom();
-    protected Client joe;
-    protected Client jack;
+    @Parameterized.Parameters(name = "{0}")
+    public static Collection<Object[]> parameters() {
+        return Implementations.all();
+    }
+
+    @Parameterized.Parameter(0)
+    public Implementation implementation;
+
+    private ChatRoom chatRoom;
+    private Client joe;
+    private Client jack;
     private Output joeOutput;
 
     @Before
     public void before_each() throws Exception {
+        chatRoom = implementation.newChatRoom();
         joeOutput = new MemoryOutput();
-        joe = new Client("Joe", aClientChatRoom(), joeOutput);
-        jack = new Client("Jack", aClientChatRoom(), new MemoryOutput());
+        joe = implementation.newClient("Joe", aClientChatRoom(), joeOutput);
+        jack = implementation.newClient("Jack", aClientChatRoom(), new MemoryOutput());
 
         joe.enter();
     }
