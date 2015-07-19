@@ -1,12 +1,11 @@
-package net.bourgau.philippe.concurrency.kata.monothread;
+package net.bourgau.philippe.concurrency.kata.unbounded.sync;
 
 import net.bourgau.philippe.concurrency.kata.common.*;
 
-public class MonoThread implements Implementation {
-
+public class UnboundedSync implements Implementation {
     @Override
-    public InProcessChatRoom newChatRoom() {
-        return new InProcessChatRoom();
+    public ChatRoom newChatRoom() {
+        return new SynchronizedChatRoom(new InProcessChatRoom());
     }
 
     @Override
@@ -16,6 +15,6 @@ public class MonoThread implements Implementation {
 
     @Override
     public String toString() {
-        return "Mono Threaded";
+        return "Unbounded Synchronized";
     }
 }
