@@ -2,6 +2,8 @@ package net.bourgau.philippe.concurrency.kata.monothread;
 
 import net.bourgau.philippe.concurrency.kata.common.*;
 
+import java.util.concurrent.TimeUnit;
+
 public class MonoThread implements Implementation {
 
     @Override
@@ -12,6 +14,10 @@ public class MonoThread implements Implementation {
     @Override
     public Client newClient(String name, ChatRoom chatRoom, Output out) {
         return new Client(name, chatRoom, out);
+    }
+
+    @Override
+    public void awaitOrShutdown(int count, TimeUnit timeUnit) throws InterruptedException {
     }
 
     @Override

@@ -44,6 +44,7 @@ public class EndToEndTest {
         jack = implementation.newClient("Jack", aClientChatRoom(), new MemoryOutput());
 
         joe.enter();
+        joeShouldReceive(welcome("Joe"));
     }
 
     @After
@@ -104,20 +105,29 @@ public class EndToEndTest {
         joeShouldReceive(exit("Jack"));
     }
 
-    @Test(expected = Exception.class)
+    @Test(expected = ConditionTimeoutException.class)
     public void
     a_client_cannot_write_after_it_left() throws Exception {
-        joe.leave();
+        jack.enter();
+        joeShouldReceive(welcome("Jack"));
 
-        joe.announce("Hello ?");
+        jack.leave();
+        joeShouldReceive(exit("Jack"));
+
+        jack.announce("All alone now ...");
+
+        joeShouldReceive(signed("Jack", "Are alone now ..."));
     }
 
     @Test(expected = ConditionTimeoutException.class)
     public void
     a_client_no_longer_receives_messages_after_it_left() throws Exception {
         jack.enter();
+        joeShouldReceive(welcome("Jack"));
 
         joe.leave();
+        joeShouldReceive(welcome("Joe"));
+
         jack.announce("Are you there ?");
 
         joeShouldReceive(signed("Jack", "Are you there ?"));

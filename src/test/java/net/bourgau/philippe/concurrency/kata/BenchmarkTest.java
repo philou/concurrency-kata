@@ -14,6 +14,7 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @RunWith(Parameterized.class)
 public class BenchmarkTest {
@@ -37,11 +38,13 @@ public class BenchmarkTest {
 
     private static Collection<Object[]> scenarios() {
         ArrayList<Object[]> parameters = new ArrayList<>();
-        parameters.add(new Object[]{10, 10});
+        parameters.add(new Object[]{100, 100}); // warmup
+        parameters.add(new Object[]{10000, 1});
         parameters.add(new Object[]{1000, 10});
         parameters.add(new Object[]{100, 1000});
         parameters.add(new Object[]{10, 100000});
-        parameters.add(new Object[]{1, 10000000});
+        parameters.add(new Object[]{1, 1000000}); // as there is only 1 client, there is no need to
+        // overwhelm the machine with too many messages
         return parameters;
     }
 
@@ -50,10 +53,10 @@ public class BenchmarkTest {
 
     @Parameterized.Parameter(1)
     public int clientCount;
+
     @Parameterized.Parameter(2)
     public int messagePerClientCount;
 
-    private ChatRoom chatRoom;
     private List<Client> clients = new ArrayList<>();
     private Output messageOutput = new NullOutput();
 
@@ -66,7 +69,7 @@ public class BenchmarkTest {
 
     @Before
     public void before_each() throws Exception {
-        chatRoom = implementation.newChatRoom();
+        ChatRoom chatRoom = implementation.newChatRoom();
 
         for (int i = 0; i < clientCount; i++) {
             Client client = implementation.newClient("Client#" + i, chatRoom, messageOutput);
@@ -75,7 +78,7 @@ public class BenchmarkTest {
         }
     }
 
-    @Test
+    @Test(timeout = 20000)
     public void benchmark() throws Exception {
         long startMillis = System.currentTimeMillis();
 
@@ -85,6 +88,8 @@ public class BenchmarkTest {
             }
         }
 
+        shutdown(19000);
+
         double duration = (System.currentTimeMillis() - startMillis) / 1000.;
         int outgoingMessages = clientCount * messagePerClientCount * clientCount;
         stdOutput.write(String.format("%s, %s x %s,%s\n",
@@ -93,10 +98,12 @@ public class BenchmarkTest {
 
     @After
     public void after_each() throws Exception {
-        for (Client client : clients) {
-            client.leave();
-        }
+        shutdown(500);
         stdOutput.flush();
+    }
+
+    private void shutdown(int millis) throws InterruptedException {
+        implementation.awaitOrShutdown(millis, TimeUnit.MILLISECONDS);
     }
 
     @AfterClass

@@ -20,7 +20,7 @@ public class Client implements Output {
 
     public void announce(String message) {
         if (!entered) {
-            throw new IllegalStateException("Client cannot write messages after leaving the room.");
+            return;
         }
         chatRoom.broadcast(this, message);
     }
