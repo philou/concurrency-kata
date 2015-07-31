@@ -3,6 +3,8 @@ package net.bourgau.philippe.concurrency.kata.unbounded.sync;
 import net.bourgau.philippe.concurrency.kata.common.ChatRoom;
 import net.bourgau.philippe.concurrency.kata.common.Output;
 
+import java.util.concurrent.TimeUnit;
+
 public class SynchronizedChatRoom implements ChatRoom {
 
     private final ChatRoom realChatRoom;
@@ -24,5 +26,10 @@ public class SynchronizedChatRoom implements ChatRoom {
     @Override
     public synchronized void leave(Output client) {
         realChatRoom.leave(client);
+    }
+
+    @Override
+    public boolean waitForAbandon(long count, TimeUnit timeUnit) throws InterruptedException {
+        return realChatRoom.waitForAbandon(count, timeUnit);
     }
 }

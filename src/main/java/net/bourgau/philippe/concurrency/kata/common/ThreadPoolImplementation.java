@@ -31,8 +31,9 @@ public abstract class ThreadPoolImplementation implements Implementation {
         try {
             if (!threadPool.awaitTermination(count, timeUnit)) {
                 threadPool.shutdownNow();
-                threadPool.awaitTermination(500, TimeUnit.MILLISECONDS);
-                throw new RuntimeException("The thread pool could not finish all its tasks");
+                if (!threadPool.awaitTermination(500, TimeUnit.MILLISECONDS)) {
+                    throw new RuntimeException("The thread pool could not force stop all its tasks");
+                }
             }
 
         } catch (InterruptedException ie) {

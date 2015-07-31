@@ -1,6 +1,7 @@
 package net.bourgau.philippe.concurrency.kata.common;
 
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class ConcurrentChatRoom implements ChatRoom {
 
@@ -40,5 +41,10 @@ public class ConcurrentChatRoom implements ChatRoom {
                 realChatroom.leave(client);
             }
         });
+    }
+
+    @Override
+    public boolean waitForAbandon(long count, TimeUnit timeUnit) throws InterruptedException {
+        return realChatroom.waitForAbandon(count, timeUnit);
     }
 }

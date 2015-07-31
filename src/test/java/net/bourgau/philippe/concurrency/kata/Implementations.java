@@ -5,6 +5,7 @@ import net.bourgau.philippe.concurrency.kata.bounded.concurrent.BoundedConcurren
 import net.bourgau.philippe.concurrency.kata.monothread.MonoThread;
 import net.bourgau.philippe.concurrency.kata.unbounded.concurrent.UnboundedConcurrent;
 import net.bourgau.philippe.concurrency.kata.unbounded.sync.UnboundedSync;
+import org.apache.commons.lang.ArrayUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,6 +33,16 @@ public class Implementations {
         ArrayList<Object[]> parameters = new ArrayList<>();
         for (Object value : values) {
             parameters.add(new Object[]{value});
+        }
+        return parameters;
+    }
+
+    static Collection<Object[]> crossProduct(Collection<Object[]> xs, Collection<Object[]> ys) {
+        ArrayList<Object[]> parameters = new ArrayList<>();
+        for (Object[] x : xs) {
+            for (Object[] y : ys) {
+                parameters.add(ArrayUtils.addAll(x, y));
+            }
         }
         return parameters;
     }

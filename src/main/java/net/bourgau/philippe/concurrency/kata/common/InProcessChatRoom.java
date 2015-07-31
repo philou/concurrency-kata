@@ -2,10 +2,13 @@ package net.bourgau.philippe.concurrency.kata.common;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class InProcessChatRoom implements ChatRoom {
 
     private final Map<Output, String> clients;
+    private CountDownLatch abandonLatch = new CountDownLatch(1);
 
     public InProcessChatRoom(Map<Output, String> emptyClientsMap) {
         clients = emptyClientsMap;
@@ -41,5 +44,13 @@ public class InProcessChatRoom implements ChatRoom {
         String pseudo = clients.get(client);
         clients.remove(client);
         broadcast(Message.exit(pseudo));
+        if (clients.size() == 0) {
+            abandonLatch.countDown();
+        }
+    }
+
+    @Override
+    public boolean waitForAbandon(long count, TimeUnit timeUnit) throws InterruptedException {
+        return abandonLatch.await(count, timeUnit);
     }
 }

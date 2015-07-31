@@ -4,36 +4,26 @@ import net.bourgau.philippe.concurrency.kata.common.ChatRoom;
 import net.bourgau.philippe.concurrency.kata.common.Client;
 import net.bourgau.philippe.concurrency.kata.common.Implementation;
 import net.bourgau.philippe.concurrency.kata.common.Output;
-import org.apache.commons.lang.ArrayUtils;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.io.BufferedWriter;
-import java.io.OutputStreamWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static net.bourgau.philippe.concurrency.kata.Implementations.crossProduct;
+
 @RunWith(Parameterized.class)
 public class BenchmarkTest {
 
-    private static BufferedWriter stdOutput;
+    private static StringBuilder output;
 
     @Parameterized.Parameters(name = "{0}, {1} clients each sending {2} messages")
     public static Collection<Object[]> parameters() {
         return crossProduct(Implementations.all(), scenarios());
-    }
-
-    private static Collection<Object[]> crossProduct(Collection<Object[]> xs, Collection<Object[]> ys) {
-        ArrayList<Object[]> parameters = new ArrayList<>();
-        for (Object[] x : xs) {
-            for (Object[] y : ys) {
-                parameters.add(ArrayUtils.addAll(x, y));
-            }
-        }
-        return parameters;
     }
 
     private static Collection<Object[]> scenarios() {
@@ -56,19 +46,19 @@ public class BenchmarkTest {
     @Parameterized.Parameter(2)
     public int messagePerClientCount;
 
+    private ChatRoom chatRoom;
     private List<Client> clients = new ArrayList<>();
     private Output messageOutput = new NullOutput();
 
     @BeforeClass
     public static void before_all() throws Exception {
-        stdOutput = new BufferedWriter(new OutputStreamWriter(System.out));
-        stdOutput.write("implementation, scenario, outgoing throughput(message/second)\n");
-        stdOutput.flush();
+        output = new StringBuilder();
+        output.append("implementation, scenario, outgoing throughput(message/second)\n");
     }
 
     @Before
     public void before_each() throws Exception {
-        ChatRoom chatRoom = implementation.startNewChatRoom();
+        chatRoom = implementation.startNewChatRoom();
 
         for (int i = 0; i < clientCount; i++) {
             Client client = implementation.newClient("Client#" + i, chatRoom, messageOutput);
@@ -77,7 +67,7 @@ public class BenchmarkTest {
         }
     }
 
-    @Test(timeout = 20000)
+    @Test
     public void benchmark() throws Exception {
         long startMillis = System.currentTimeMillis();
 
@@ -86,27 +76,32 @@ public class BenchmarkTest {
                 client.announce("wazzzaaa");
             }
         }
+        for (Client client : clients) {
+            client.leave();
+        }
 
-        shutdown(19000);
+        if (!chatRoom.waitForAbandon(20, TimeUnit.SECONDS)) {
+            printThroughput("Did not finish");
+            return;
+        }
 
         double duration = (System.currentTimeMillis() - startMillis) / 1000.;
         int outgoingMessages = clientCount * messagePerClientCount * clientCount;
-        stdOutput.write(String.format("%s, %s x %s,%s\n",
-                implementation, clientCount, messagePerClientCount, outgoingMessages / duration));
+        printThroughput(outgoingMessages / duration);
     }
 
     @After
     public void after_each() throws Exception {
-        shutdown(500);
-        stdOutput.flush();
-    }
-
-    private void shutdown(int millis) throws InterruptedException {
-        implementation.awaitOrShutdown(millis, TimeUnit.MILLISECONDS);
+        implementation.awaitOrShutdown(500, TimeUnit.MILLISECONDS);
     }
 
     @AfterClass
     public static void after_all() throws Exception {
-        stdOutput.close();
+        System.out.print(output);
+    }
+
+    private void printThroughput(Object throughput) throws IOException {
+        output.append(String.format("%s, %s x %s, %s\n",
+                implementation, clientCount, messagePerClientCount, throughput));
     }
 }
