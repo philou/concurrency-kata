@@ -2,13 +2,14 @@ package net.bourgau.philippe.concurrency.kata.monothread;
 
 import net.bourgau.philippe.concurrency.kata.common.*;
 
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 public class MonoThread implements Implementation {
 
     @Override
     public InProcessChatRoom newChatRoom() {
-        return new InProcessChatRoom();
+        return new InProcessChatRoom(new HashMap<Output, String>());
     }
 
     @Override

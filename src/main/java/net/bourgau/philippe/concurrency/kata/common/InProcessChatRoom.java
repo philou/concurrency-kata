@@ -5,7 +5,11 @@ import java.util.Map;
 
 public class InProcessChatRoom implements ChatRoom {
 
-    private final Map<Output, String> clients = new HashMap<>();
+    private final Map<Output, String> clients;
+
+    public InProcessChatRoom(Map<Output, String> emptyClientsMap) {
+        clients = emptyClientsMap;
+    }
 
     @Override
     public void enter(Output client, String pseudo) {

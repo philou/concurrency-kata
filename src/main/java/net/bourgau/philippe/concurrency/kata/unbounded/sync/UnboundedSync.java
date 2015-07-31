@@ -2,25 +2,16 @@ package net.bourgau.philippe.concurrency.kata.unbounded.sync;
 
 import net.bourgau.philippe.concurrency.kata.common.*;
 
+import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
-public class UnboundedSync implements Implementation {
-
-    private ExecutorService threadPool;
+public class UnboundedSync extends ThreadPoolImplementation {
 
     @Override
-    public ChatRoom newChatRoom() {
-        threadPool = Executors.newCachedThreadPool();
+    protected ChatRoom newChatRoom(ExecutorService threadPool) {
         return new ConcurrentChatRoom(
-                new SynchronizedChatRoom(new InProcessChatRoom()),
+                new SynchronizedChatRoom(new InProcessChatRoom(new HashMap<Output, String>())),
                 threadPool);
-    }
-
-    @Override
-    public Client newClient(String name, ChatRoom chatRoom, Output out) {
-        return new Client(name, chatRoom, out);
     }
 
     @Override
@@ -28,20 +19,4 @@ public class UnboundedSync implements Implementation {
         return "Unbounded Synchronized";
     }
 
-    @Override
-    public void awaitOrShutdown(int count, TimeUnit timeUnit) throws InterruptedException {
-        threadPool.shutdown();
-        try {
-            if (!threadPool.awaitTermination(count, timeUnit)) {
-                threadPool.shutdownNow();
-                threadPool.awaitTermination(500, TimeUnit.MILLISECONDS);
-                throw new RuntimeException("The thread pool could not finish all its tasks");
-            }
-
-        } catch (InterruptedException ie) {
-            threadPool.shutdownNow();
-            Thread.currentThread().interrupt();
-            throw ie;
-        }
-    }
 }
