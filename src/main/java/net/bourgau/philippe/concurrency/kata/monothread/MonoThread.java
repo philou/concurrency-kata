@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 public class MonoThread implements Implementation {
 
     @Override
-    public InProcessChatRoom newChatRoom() {
+    public InProcessChatRoom startNewChatRoom() {
         return new InProcessChatRoom(new HashMap<Output, String>());
     }
 

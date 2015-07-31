@@ -7,7 +7,7 @@ public abstract class ThreadPoolImplementation implements Implementation {
     private ExecutorService threadPool;
 
     @Override
-    public ChatRoom newChatRoom() {
+    public ChatRoom startNewChatRoom() {
         threadPool = newThreadPool();
         return newChatRoom(threadPool);
     }
@@ -23,6 +23,10 @@ public abstract class ThreadPoolImplementation implements Implementation {
 
     @Override
     public void awaitOrShutdown(int count, TimeUnit timeUnit) throws InterruptedException {
+        awaitOrShutdown(threadPool, count, timeUnit);
+    }
+
+    protected void awaitOrShutdown(ExecutorService threadPool, int count, TimeUnit timeUnit) throws InterruptedException {
         threadPool.shutdown();
         try {
             if (!threadPool.awaitTermination(count, timeUnit)) {

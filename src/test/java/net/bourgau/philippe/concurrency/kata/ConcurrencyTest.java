@@ -37,7 +37,7 @@ public class ConcurrencyTest {
 
     @Before
     public void setUp() throws Exception {
-        chatRoom = implementation.newChatRoom();
+        chatRoom = implementation.startNewChatRoom();
         clientThreads = new ArrayList<>();
         startLatch = new CountDownLatch(1);
         countingOutput = new CountingOutput();

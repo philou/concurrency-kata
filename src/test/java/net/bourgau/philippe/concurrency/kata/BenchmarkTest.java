@@ -68,7 +68,7 @@ public class BenchmarkTest {
 
     @Before
     public void before_each() throws Exception {
-        ChatRoom chatRoom = implementation.newChatRoom();
+        ChatRoom chatRoom = implementation.startNewChatRoom();
 
         for (int i = 0; i < clientCount; i++) {
             Client client = implementation.newClient("Client#" + i, chatRoom, messageOutput);

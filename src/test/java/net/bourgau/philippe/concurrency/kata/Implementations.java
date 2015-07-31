@@ -1,5 +1,6 @@
 package net.bourgau.philippe.concurrency.kata;
 
+import net.bourgau.philippe.concurrency.kata.actors.threads.green.ActorsRealThreads;
 import net.bourgau.philippe.concurrency.kata.bounded.concurrent.BoundedConcurrent;
 import net.bourgau.philippe.concurrency.kata.monothread.MonoThread;
 import net.bourgau.philippe.concurrency.kata.unbounded.concurrent.UnboundedConcurrent;
@@ -15,14 +16,16 @@ public class Implementations {
                 new MonoThread(),
                 new UnboundedSync(),
                 new UnboundedConcurrent(),
-                new BoundedConcurrent());
+                new BoundedConcurrent(),
+                new ActorsRealThreads());
     }
 
     static Collection<Object[]> multithreaded() {
         return jUnitParameters(
                 new UnboundedSync(),
                 new UnboundedConcurrent(),
-                new BoundedConcurrent());
+                new BoundedConcurrent(),
+                new ActorsRealThreads());
     }
 
     private static Collection<Object[]> jUnitParameters(Object... values) {

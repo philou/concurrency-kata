@@ -3,7 +3,7 @@ package net.bourgau.philippe.concurrency.kata.common;
 import java.util.concurrent.TimeUnit;
 
 public interface Implementation {
-    ChatRoom newChatRoom();
+    ChatRoom startNewChatRoom();
 
     Client newClient(String name, ChatRoom chatRoom, Output out);
 

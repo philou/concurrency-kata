@@ -38,7 +38,7 @@ public class EndToEndTest {
 
     @Before
     public void before_each() throws Exception {
-        chatRoom = implementation.newChatRoom();
+        chatRoom = implementation.startNewChatRoom();
         joeOutput = new MemoryOutput();
         joe = implementation.newClient("Joe", aClientChatRoom(), joeOutput);
         jack = implementation.newClient("Jack", aClientChatRoom(), new MemoryOutput());
