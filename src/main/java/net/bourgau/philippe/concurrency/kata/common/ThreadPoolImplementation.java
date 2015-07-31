@@ -18,7 +18,7 @@ public abstract class ThreadPoolImplementation implements Implementation {
 
     @Override
     public Client newClient(String name, ChatRoom chatRoom, Output out) {
-        return new Client(name, chatRoom, out);
+        return new InProcessClient(name, chatRoom, out);
     }
 
     @Override

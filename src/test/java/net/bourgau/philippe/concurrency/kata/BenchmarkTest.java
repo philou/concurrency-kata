@@ -43,8 +43,7 @@ public class BenchmarkTest {
         parameters.add(new Object[]{1000, 10});
         parameters.add(new Object[]{100, 1000});
         parameters.add(new Object[]{10, 100000});
-        parameters.add(new Object[]{1, 1000000}); // as there is only 1 client, there is no need to
-        // overwhelm the machine with too many messages
+        parameters.add(new Object[]{1, 1000000});
         return parameters;
     }
 
