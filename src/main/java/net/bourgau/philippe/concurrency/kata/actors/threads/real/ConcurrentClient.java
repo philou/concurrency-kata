@@ -1,4 +1,7 @@
-package net.bourgau.philippe.concurrency.kata.common;
+package net.bourgau.philippe.concurrency.kata.actors.threads.real;
+
+import net.bourgau.philippe.concurrency.kata.common.Client;
+import net.bourgau.philippe.concurrency.kata.common.UnsafeRunnable;
 
 import java.util.concurrent.ExecutorService;
 

@@ -67,7 +67,7 @@ public class BenchmarkTest {
         }
     }
 
-    @Test
+    @Test(timeout = 40000)
     public void benchmark() throws Exception {
         long startMillis = System.currentTimeMillis();
 

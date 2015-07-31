@@ -1,20 +1,21 @@
-package net.bourgau.philippe.concurrency.kata.actors.threads.green;
+package net.bourgau.philippe.concurrency.kata.actors.threads.real;
 
 import net.bourgau.philippe.concurrency.kata.common.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class ActorsRealThreads extends ThreadPoolImplementation {
 
-    private CopyOnWriteArrayList<ExecutorService> clientThreadPools;
+    private List<ExecutorService> clientThreadPools;
 
     @Override
     public ChatRoom startNewChatRoom() {
-        clientThreadPools = new CopyOnWriteArrayList<>();
+        clientThreadPools = new ArrayList<>();
         return super.startNewChatRoom();
     }
 
