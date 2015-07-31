@@ -1,7 +1,6 @@
 package net.bourgau.philippe.concurrency.kata.common;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public abstract class ThreadPoolImplementation implements Implementation {
@@ -13,9 +12,7 @@ public abstract class ThreadPoolImplementation implements Implementation {
         return newChatRoom(threadPool);
     }
 
-    protected ExecutorService newThreadPool() {
-        return Executors.newCachedThreadPool();
-    }
+    protected abstract ExecutorService newThreadPool();
 
     protected abstract ChatRoom newChatRoom(ExecutorService threadPool);
 

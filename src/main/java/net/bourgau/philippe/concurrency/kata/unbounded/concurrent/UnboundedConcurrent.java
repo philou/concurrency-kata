@@ -1,12 +1,12 @@
-package net.bourgau.philippe.concurrency.kata.unbounded.sync;
+package net.bourgau.philippe.concurrency.kata.unbounded.concurrent;
 
 import net.bourgau.philippe.concurrency.kata.common.*;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class UnboundedSync extends ThreadPoolImplementation {
+public class UnboundedConcurrent extends ThreadPoolImplementation {
 
     @Override
     protected ExecutorService newThreadPool() {
@@ -14,14 +14,14 @@ public class UnboundedSync extends ThreadPoolImplementation {
     }
 
     @Override
-    protected ChatRoom newChatRoom(ExecutorService threadPool) {
+    public ChatRoom newChatRoom(ExecutorService threadPool) {
         return new ConcurrentChatRoom(
-                new SynchronizedChatRoom(new InProcessChatRoom(new HashMap<Output, String>())),
+                new InProcessChatRoom(new ConcurrentHashMap<Output, String>()),
                 threadPool);
     }
 
     @Override
     public String toString() {
-        return "Unbounded Synchronized";
+        return "Unbounded Concurrent";
     }
 }

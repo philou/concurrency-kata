@@ -1,11 +1,19 @@
-package net.bourgau.philippe.concurrency.kata.concurrent.unbounded;
+package net.bourgau.philippe.concurrency.kata.bounded.concurrent;
 
 import net.bourgau.philippe.concurrency.kata.common.*;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-public class UnboundedConcurrent extends ThreadPoolImplementation {
+import static java.lang.Runtime.getRuntime;
+
+public class BoundedConcurrent extends ThreadPoolImplementation {
+
+    @Override
+    protected ExecutorService newThreadPool() {
+        return Executors.newFixedThreadPool(getRuntime().availableProcessors());
+    }
 
     @Override
     public ChatRoom newChatRoom(ExecutorService threadPool) {
@@ -16,6 +24,6 @@ public class UnboundedConcurrent extends ThreadPoolImplementation {
 
     @Override
     public String toString() {
-        return "Unbounded Concurrent";
+        return "Bounded Concurrent";
     }
 }
