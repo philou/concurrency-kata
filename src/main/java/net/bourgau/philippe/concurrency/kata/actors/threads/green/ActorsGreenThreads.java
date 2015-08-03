@@ -4,42 +4,27 @@ import net.bourgau.philippe.concurrency.kata.common.*;
 
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Executors;
 
 import static java.lang.Runtime.getRuntime;
-import static java.util.concurrent.Executors.newFixedThreadPool;
 
 public class ActorsGreenThreads extends ThreadPoolImplementation {
 
-    private ExecutorService clientThreadPool;
-
-    @Override
-    public ChatRoom startNewChatRoom() {
-        clientThreadPool = newFixedThreadPool(getRuntime().availableProcessors() - 1);
-        return super.startNewChatRoom();
-    }
-
     @Override
     protected ExecutorService newThreadPool() {
-        return newFixedThreadPool(1);
+        return Executors.newFixedThreadPool(getRuntime().availableProcessors());
     }
 
     @Override
-    protected ChatRoom newChatRoom(ExecutorService threadPool) {
-        return new ConcurrentChatRoom(
+    protected ChatRoom newChatRoom() {
+        return new ChatRoomActor(
                 new InProcessChatRoom(new HashMap<Output, String>()),
-                threadPool);
+                threadPool());
     }
 
     @Override
     public Client newClient(String name, ChatRoom chatRoom, Output out) {
-        return new GreenConcurrentClient(new InProcessClient(name, chatRoom, out), clientThreadPool);
-    }
-
-    @Override
-    public void awaitOrShutdown(int count, TimeUnit timeUnit) throws InterruptedException {
-        super.awaitOrShutdown(count, timeUnit);
-        awaitOrShutdown(clientThreadPool, 100, TimeUnit.MILLISECONDS);
+        return new ClientActor(new InProcessClient(name, chatRoom, out), threadPool());
     }
 
     @Override

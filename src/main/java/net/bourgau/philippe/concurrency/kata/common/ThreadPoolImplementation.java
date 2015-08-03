@@ -9,12 +9,17 @@ public abstract class ThreadPoolImplementation implements Implementation {
     @Override
     public ChatRoom startNewChatRoom() {
         threadPool = newThreadPool();
-        return newChatRoom(threadPool);
+        return newChatRoom();
     }
 
     protected abstract ExecutorService newThreadPool();
 
-    protected abstract ChatRoom newChatRoom(ExecutorService threadPool);
+    protected abstract ChatRoom newChatRoom();
+
+    protected ExecutorService threadPool() {
+        return threadPool;
+    }
+
 
     @Override
     public Client newClient(String name, ChatRoom chatRoom, Output out) {

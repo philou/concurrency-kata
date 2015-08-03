@@ -14,10 +14,10 @@ public class UnboundedConcurrent extends ThreadPoolImplementation {
     }
 
     @Override
-    public ChatRoom newChatRoom(ExecutorService threadPool) {
+    public ChatRoom newChatRoom() {
         return new ConcurrentChatRoom(
                 new InProcessChatRoom(new ConcurrentHashMap<Output, String>()),
-                threadPool);
+                threadPool());
     }
 
     @Override

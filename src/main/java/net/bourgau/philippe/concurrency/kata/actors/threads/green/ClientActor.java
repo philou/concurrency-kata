@@ -3,41 +3,21 @@ package net.bourgau.philippe.concurrency.kata.actors.threads.green;
 import net.bourgau.philippe.concurrency.kata.common.Client;
 import net.bourgau.philippe.concurrency.kata.common.UnsafeRunnable;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 
-public class GreenConcurrentClient implements Client, Runnable {
+public class ClientActor extends Actor implements Client {
 
     private final Client realClient;
-    private final ExecutorService threadPool;
-    private final ConcurrentLinkedQueue<Runnable> mailbox = new ConcurrentLinkedQueue<>();
-    private boolean left;
 
-    public GreenConcurrentClient(Client realClient, ExecutorService threadPool) {
+    public ClientActor(Client realClient, ExecutorService threadPool) {
+        super(threadPool);
         this.realClient = realClient;
-        this.threadPool = threadPool;
-        submitContinuation();
-    }
-
-    private void submitContinuation() {
-        threadPool.submit(this);
-    }
-
-    public void run() {
-        if (left) {
-            return;
-        }
-
-        Runnable nextMessage = mailbox.poll();
-        if (nextMessage != null) {
-            nextMessage.run();
-        }
-        submitContinuation();
+        start();
     }
 
     @Override
     public void enter() throws Exception {
-        mailbox.add(new UnsafeRunnable() {
+        send(new UnsafeRunnable() {
             @Override
             public void doRun() throws Exception {
                 realClient.enter();
@@ -47,7 +27,7 @@ public class GreenConcurrentClient implements Client, Runnable {
 
     @Override
     public void announce(final String message) {
-        mailbox.add(new UnsafeRunnable() {
+        send(new UnsafeRunnable() {
             @Override
             public void doRun() throws Exception {
                 realClient.announce(message);
@@ -57,10 +37,10 @@ public class GreenConcurrentClient implements Client, Runnable {
 
     @Override
     public void leave() throws Exception {
-        mailbox.add(new UnsafeRunnable() {
+        send(new UnsafeRunnable() {
             @Override
             public void doRun() throws Exception {
-                left = true;
+                stop();
                 realClient.leave();
             }
         });
@@ -68,7 +48,7 @@ public class GreenConcurrentClient implements Client, Runnable {
 
     @Override
     public void write(final String line) {
-        mailbox.add(new UnsafeRunnable() {
+        send(new UnsafeRunnable() {
             @Override
             public void doRun() throws Exception {
                 realClient.write(line);
