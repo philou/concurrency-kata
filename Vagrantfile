@@ -112,8 +112,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     if [ ! -d "$HOME/.idea" ]; then
       echo "Installing IDEA"
 
-      wget http://download.jetbrains.com/idea/ideaIC-14.1.1.tar.gz
-      tar -zxvf ideaIC-14.1.1.tar.gz
+      wget http://download.jetbrains.com/idea/ideaIC-14.1.4.tar.gz
+      tar -zxvf ideaIC-14.1.4.tar.gz
 
       mv `find . -maxdepth 1 -type d -and -name "idea-IC-141*"` $HOME/.idea
 

@@ -1,8 +1,10 @@
-package net.bourgau.philippe.concurrency.kata;
+package net.bourgau.philippe.concurrency.kata.tests;
 
 import com.jayway.awaitility.Awaitility;
 import com.jayway.awaitility.core.ConditionFactory;
 import com.jayway.awaitility.core.ConditionTimeoutException;
+import net.bourgau.philippe.concurrency.kata.Implementations;
+import net.bourgau.philippe.concurrency.kata.MemoryOutput;
 import net.bourgau.philippe.concurrency.kata.common.ChatRoom;
 import net.bourgau.philippe.concurrency.kata.common.Client;
 import net.bourgau.philippe.concurrency.kata.common.Implementation;

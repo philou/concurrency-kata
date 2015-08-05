@@ -1,5 +1,8 @@
-package net.bourgau.philippe.concurrency.kata;
+package net.bourgau.philippe.concurrency.kata.tests;
 
+import net.bourgau.philippe.concurrency.kata.CountingOutput;
+import net.bourgau.philippe.concurrency.kata.Implementations;
+import net.bourgau.philippe.concurrency.kata.NullOutput;
 import net.bourgau.philippe.concurrency.kata.common.ChatRoom;
 import net.bourgau.philippe.concurrency.kata.common.Client;
 import net.bourgau.philippe.concurrency.kata.common.Implementation;

@@ -13,8 +13,8 @@ import java.util.Collection;
 
 public class Implementations {
 
-    static Collection<Object[]> all() {
-        return jUnitParameters(
+    public static Collection<Object[]> all() {
+        return simple(
                 new MonoThread(),
                 new UnboundedSync(),
                 new UnboundedConcurrent(),
@@ -23,8 +23,15 @@ public class Implementations {
                 new ActorsGreenThreads());
     }
 
-    static Collection<Object[]> multithreaded() {
-        return jUnitParameters(
+    public static Collection<Object[]> bounded() {
+        return simple(
+                new MonoThread(),
+                new BoundedConcurrent(),
+                new ActorsGreenThreads());
+    }
+
+    public static Collection<Object[]> multithreaded() {
+        return simple(
                 new UnboundedSync(),
                 new UnboundedConcurrent(),
                 new BoundedConcurrent(),
@@ -32,7 +39,7 @@ public class Implementations {
                 new ActorsGreenThreads());
     }
 
-    private static Collection<Object[]> jUnitParameters(Object... values) {
+    public static Collection<Object[]> simple(Object... values) {
         ArrayList<Object[]> parameters = new ArrayList<>();
         for (Object value : values) {
             parameters.add(new Object[]{value});
@@ -40,7 +47,15 @@ public class Implementations {
         return parameters;
     }
 
-    static Collection<Object[]> crossProduct(Collection<Object[]> xs, Collection<Object[]> ys) {
+    public static Collection<Object[]> complex(Object[]... objects) {
+        ArrayList<Object[]> parameters = new ArrayList<>();
+        for (Object[] object : objects) {
+            parameters.add(object);
+        }
+        return parameters;
+    }
+
+    public static Collection<Object[]> crossProduct(Collection<Object[]> xs, Collection<Object[]> ys) {
         ArrayList<Object[]> parameters = new ArrayList<>();
         for (Object[] x : xs) {
             for (Object[] y : ys) {

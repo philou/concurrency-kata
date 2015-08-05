@@ -14,11 +14,11 @@ public class CountingOutput implements Output {
         messageCount.incrementAndGet();
     }
 
-    void reset() {
+    public void reset() {
         messageCount.set(0);
     }
 
-    IntegerAssert assertMessageCount() {
+    public IntegerAssert assertMessageCount() {
         return Assertions.assertThat(messageCount.get());
     }
 }
