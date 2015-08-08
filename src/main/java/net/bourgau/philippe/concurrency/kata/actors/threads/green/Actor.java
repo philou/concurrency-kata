@@ -6,7 +6,7 @@ import java.util.concurrent.ExecutorService;
 public class Actor implements Runnable {
     protected final ExecutorService threadPool;
     private final ConcurrentLinkedQueue<Runnable> mailbox = new ConcurrentLinkedQueue<>();
-    private volatile boolean stoped;
+    private boolean stoped;
 
     public Actor(ExecutorService threadPool) {
         this.threadPool = threadPool;
