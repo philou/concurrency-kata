@@ -3,6 +3,7 @@ package net.bourgau.philippe.concurrency.kata;
 import net.bourgau.philippe.concurrency.kata.actors.threads.green.ActorsGreenThreads;
 import net.bourgau.philippe.concurrency.kata.actors.threads.real.ActorsRealThreads;
 import net.bourgau.philippe.concurrency.kata.bounded.concurrent.BoundedConcurrent;
+import net.bourgau.philippe.concurrency.kata.csp.CSP;
 import net.bourgau.philippe.concurrency.kata.monothread.MonoThread;
 import net.bourgau.philippe.concurrency.kata.unbounded.concurrent.UnboundedConcurrent;
 import net.bourgau.philippe.concurrency.kata.unbounded.sync.UnboundedSync;
@@ -20,14 +21,16 @@ public class Implementations {
                 new UnboundedConcurrent(),
                 new BoundedConcurrent(),
                 new ActorsRealThreads(),
-                new ActorsGreenThreads());
+                new ActorsGreenThreads(),
+                new CSP());
     }
 
     public static Collection<Object[]> bounded() {
         return simple(
                 new MonoThread(),
                 new BoundedConcurrent(),
-                new ActorsGreenThreads());
+                new ActorsGreenThreads(),
+                new CSP());
     }
 
     public static Collection<Object[]> multithreaded() {
@@ -36,7 +39,8 @@ public class Implementations {
                 new UnboundedConcurrent(),
                 new BoundedConcurrent(),
                 new ActorsRealThreads(),
-                new ActorsGreenThreads());
+                new ActorsGreenThreads(),
+                new CSP());
     }
 
     public static Collection<Object[]> simple(Object... values) {
