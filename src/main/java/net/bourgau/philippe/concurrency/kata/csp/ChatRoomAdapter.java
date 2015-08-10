@@ -8,27 +8,27 @@ import java.util.concurrent.TimeUnit;
 
 public class ChatRoomAdapter implements ChatRoom {
 
-    private final Actor chatRoom;
+    private final Channel<Action<ChatRoom>> chatRoomChannel;
     private final InProcessChatRoom realChatroom;
 
-    public ChatRoomAdapter(Actor chatRoom, InProcessChatRoom realChatroom) {
-        this.chatRoom = chatRoom;
+    public ChatRoomAdapter(InProcessChatRoom realChatroom, Channel<Action<ChatRoom>> chatRoomChannel) {
+        this.chatRoomChannel = chatRoomChannel;
         this.realChatroom = realChatroom;
     }
 
     @Override
     public void enter(Output client, String pseudo) {
-        chatRoom.send(ChatRoomMessages.enter(client, pseudo));
+        chatRoomChannel.push(ChatRoomMessages.enter(client, pseudo));
     }
 
     @Override
     public void broadcast(Output client, String message) {
-        chatRoom.send(ChatRoomMessages.broadcast(client, message));
+        chatRoomChannel.push(ChatRoomMessages.broadcast(client, message));
     }
 
     @Override
     public void leave(Output client) {
-        chatRoom.send(ChatRoomMessages.leave(client));
+        chatRoomChannel.push(ChatRoomMessages.leave(client));
     }
 
     @Override

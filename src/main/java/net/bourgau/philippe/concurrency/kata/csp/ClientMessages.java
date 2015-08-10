@@ -36,7 +36,7 @@ public final class ClientMessages {
             @Override
             public void doExecute(Client subject) throws Exception {
                 // we could stop by pushing a 'close' message in the channel
-//                subject.stop();
+                // subject.stop();
                 subject.leave();
             }
         };

@@ -4,30 +4,29 @@ import net.bourgau.philippe.concurrency.kata.common.Client;
 
 public class ClientAdapter implements Client {
 
-    private final Actor client;
+    private final Channel<Action<Client>> clientChannel;
 
-    public ClientAdapter(Actor client) {
-
-        this.client = client;
+    public ClientAdapter(Channel<Action<Client>> clientChannel) {
+        this.clientChannel = clientChannel;
     }
 
     @Override
     public void write(String line) {
-        client.send(ClientMessages.write(line));
+        clientChannel.push(ClientMessages.write(line));
     }
 
     @Override
     public void leave() throws Exception {
-        client.send(ClientMessages.leave());
+        clientChannel.push(ClientMessages.leave());
     }
 
     @Override
     public void announce(String message) {
-        client.send(ClientMessages.announce(message));
+        clientChannel.push(ClientMessages.announce(message));
     }
 
     @Override
     public void enter() throws Exception {
-        client.send(ClientMessages.enter());
+        clientChannel.push(ClientMessages.enter());
     }
 }

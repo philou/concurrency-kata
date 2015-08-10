@@ -1,17 +1,18 @@
 package net.bourgau.philippe.concurrency.kata.csp;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 
-public class Actor<T> implements Runnable {
-    private final ConcurrentLinkedQueue<Action<T>> mailbox = new ConcurrentLinkedQueue<>();
+public class CoRoutine<T> implements Runnable {
+
+    private final Channel<Action<T>> mailboxChannel;
     private final T messageHandler;
     private final ExecutorService threadPool;
     private boolean stoped;
 
-    public Actor(T messageHandler, ExecutorService threadPool) {
+    public CoRoutine(T messageHandler, ExecutorService threadPool, Channel<Action<T>> channel) {
         this.messageHandler = messageHandler;
         this.threadPool = threadPool;
+        this.mailboxChannel = channel;
     }
 
     public void start() {
@@ -27,18 +28,14 @@ public class Actor<T> implements Runnable {
             return;
         }
 
-        Action<T> nextMessage = mailbox.poll();
+        Action<T> nextMessage = mailboxChannel.poll();
         if (nextMessage != null) {
             nextMessage.execute(messageHandler);
         }
         submitContinuation();
     }
 
-    protected void stop() {
+    public void stop() {
         stoped = true;
-    }
-
-    protected void send(Action runnable) {
-        mailbox.add(runnable);
     }
 }
