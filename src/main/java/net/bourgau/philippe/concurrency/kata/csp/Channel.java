@@ -17,7 +17,7 @@ public class Channel<T> {
            is pushed in the queue. This is how the channel maintains the
            illusion of the green threads from the caller side
          */
-        new Runnable() {
+        threadPool.submit(new Runnable() {
 
             @Override
             public void run() {
@@ -28,7 +28,7 @@ public class Channel<T> {
                     threadPool.submit(this);
                 }
             }
-        }.run();
+        });
     }
 
     void push(T message) {
