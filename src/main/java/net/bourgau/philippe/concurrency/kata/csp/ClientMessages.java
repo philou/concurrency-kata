@@ -32,13 +32,13 @@ public final class ClientMessages {
     }
 
     public static Action<Client> leave() {
-        return new Action<Client>() {
-            @Override
-            public void doExecute(Client subject) throws Exception {
-                // we could stop by pushing a 'close' message in the channel
-                // subject.stop();
-                subject.leave();
-            }
-        };
+        return new Leave();
+    }
+
+    public static class Leave extends Action<Client> {
+        @Override
+        public void doExecute(Client subject) throws Exception {
+            subject.leave();
+        }
     }
 }

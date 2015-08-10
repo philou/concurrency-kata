@@ -17,22 +17,22 @@ public class CSP extends ThreadPoolImplementation {
 
     @Override
     protected ChatRoom newChatRoom() {
-        Channel<Action<ChatRoom>> chatRoomChannel = new Channel<>();
+        Channel<Action<ChatRoom>> chatRoomChannel = new Channel<>(threadPool());
 
         InProcessChatRoom realChatroom = new InProcessChatRoom(new HashMap<Output, String>());
 
-        CoRoutine<ChatRoom> chatRoomCoRoutine = new CoRoutine<>(realChatroom, threadPool(), chatRoomChannel);
-        chatRoomCoRoutine.start();
+        ChatRoomCoRoutine chatRoomChatRoomCoRoutine = new ChatRoomCoRoutine(realChatroom, chatRoomChannel);
+        chatRoomChatRoomCoRoutine.run();
 
         return new ChatRoomAdapter(realChatroom, chatRoomChannel);
     }
 
     @Override
     public Client newClient(String name, ChatRoom chatRoom, Output out) {
-        Channel<Action<Client>> clientChannel = new Channel<>();
+        Channel<Action<Client>> clientChannel = new Channel<>(threadPool());
 
-        CoRoutine<Client> clientCoRoutine = new CoRoutine<>(new InProcessClient(name, chatRoom, out), threadPool(), clientChannel);
-        clientCoRoutine.start();
+        ClientCoRoutine clientCoRoutine = new ClientCoRoutine(new InProcessClient(name, chatRoom, out), clientChannel);
+        clientCoRoutine.run();
 
         return new ClientAdapter(clientChannel);
     }
