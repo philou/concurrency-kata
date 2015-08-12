@@ -1,7 +1,4 @@
-package net.bourgau.philippe.concurrency.kata.unbounded.sync;
-
-import net.bourgau.philippe.concurrency.kata.common.ChatRoom;
-import net.bourgau.philippe.concurrency.kata.common.Output;
+package net.bourgau.philippe.concurrency.kata.common;
 
 import java.util.concurrent.TimeUnit;
 
@@ -9,7 +6,7 @@ public class SynchronizedChatRoom implements ChatRoom {
 
     private final ChatRoom realChatRoom;
 
-    SynchronizedChatRoom(ChatRoom realChatRoom) {
+    public SynchronizedChatRoom(ChatRoom realChatRoom) {
         this.realChatRoom = realChatRoom;
     }
 

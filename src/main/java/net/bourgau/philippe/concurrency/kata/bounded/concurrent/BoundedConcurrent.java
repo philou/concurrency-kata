@@ -18,7 +18,7 @@ public class BoundedConcurrent extends ThreadPoolImplementation {
     @Override
     public ChatRoom newChatRoom() {
         return new ConcurrentChatRoom(
-                new InProcessChatRoom(new ConcurrentHashMap<Output, String>()),
+                new SynchronizedChatRoom(new InProcessChatRoom(new ConcurrentHashMap<Output, String>())),
                 threadPool());
     }
 
