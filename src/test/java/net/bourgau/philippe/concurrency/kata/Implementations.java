@@ -3,6 +3,7 @@ package net.bourgau.philippe.concurrency.kata;
 import net.bourgau.philippe.concurrency.kata.actors.threads.green.ActorsGreenThreads;
 import net.bourgau.philippe.concurrency.kata.actors.threads.real.ActorsRealThreads;
 import net.bourgau.philippe.concurrency.kata.bounded.concurrent.BoundedConcurrent;
+import net.bourgau.philippe.concurrency.kata.bounded.finegrained.BoundedFineGrained;
 import net.bourgau.philippe.concurrency.kata.csp.CSP;
 import net.bourgau.philippe.concurrency.kata.monothread.MonoThread;
 import net.bourgau.philippe.concurrency.kata.unbounded.concurrent.UnboundedConcurrent;
@@ -20,6 +21,7 @@ public class Implementations {
                 new UnboundedSync(),
                 new UnboundedConcurrent(),
                 new BoundedConcurrent(),
+                new BoundedFineGrained(),
                 new ActorsRealThreads(),
                 new ActorsGreenThreads(),
                 new CSP());
@@ -29,6 +31,7 @@ public class Implementations {
         return simple(
                 new MonoThread(),
                 new BoundedConcurrent(),
+                new BoundedFineGrained(),
                 new ActorsGreenThreads(),
                 new CSP());
     }
@@ -38,6 +41,7 @@ public class Implementations {
                 new UnboundedSync(),
                 new UnboundedConcurrent(),
                 new BoundedConcurrent(),
+                new BoundedFineGrained(),
                 new ActorsRealThreads(),
                 new ActorsGreenThreads(),
                 new CSP());
