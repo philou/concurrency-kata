@@ -9,7 +9,6 @@ import net.bourgau.philippe.concurrency.kata.common.ChatRoom;
 import net.bourgau.philippe.concurrency.kata.common.Client;
 import net.bourgau.philippe.concurrency.kata.common.Implementation;
 import net.bourgau.philippe.concurrency.kata.common.Output;
-import org.fest.assertions.api.StringAssert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,13 +36,15 @@ public class EndToEndTest {
     private Client joe;
     private Client jack;
     private Output joeOutput;
+    private Output jackOutput;
 
     @Before
     public void before_each() throws Exception {
         chatRoom = implementation.startNewChatRoom();
         joeOutput = new MemoryOutput();
+        jackOutput = new MemoryOutput();
         joe = implementation.newClient("Joe", aClientChatRoom(), joeOutput);
-        jack = implementation.newClient("Jack", aClientChatRoom(), new MemoryOutput());
+        jack = implementation.newClient("Jack", aClientChatRoom(), jackOutput);
 
         joe.enter();
         joeShouldReceive(welcome("Joe"));
@@ -135,17 +136,44 @@ public class EndToEndTest {
         joeShouldReceive(signed("Jack", "Are you there ?"));
     }
 
+    @Test
+    public void
+    admins_can_send_login_notice_to_all_clients_using_a_secret_prefix() throws Exception {
+        jack.enter();
+        joeShouldReceive(welcome("Jack"));
+
+        jack.announce(ChatRoom.GOD_PREFIX + "You are belong to me !");
+
+        joeShouldReceive(signed("Jack", "You are belong to me !"));
+        jackShouldReceive(signed("Jack", "You are belong to me !"));
+    }
+
+    @Test
+    public void
+    new_clients_should_receive_previous_login_message() throws Exception {
+        joe.announce(ChatRoom.GOD_PREFIX + "WARNING: No soccer talk around here !");
+
+        jack.enter();
+        joeShouldReceive(welcome("Jack"));
+
+        jackShouldReceive(signed("Joe", "WARNING: No soccer talk around here !"));
+    }
+
     protected void joeShouldReceive(final String message) {
+        shouldReceive(message, "Joe", joeOutput);
+    }
+
+    protected void jackShouldReceive(final String message) {
+        shouldReceive(message, "Joe", jackOutput);
+    }
+
+    private void shouldReceive(final String message, final String pseudo, final Output output) {
         await().until(new Runnable() {
             @Override
             public void run() {
-                joeOutput().contains(message);
+                assertThat(output.toString()).as(pseudo + "'s messages").contains(message);
             }
         });
-    }
-
-    protected StringAssert joeOutput() {
-        return assertThat(joeOutput.toString());
     }
 
     protected static ConditionFactory await() {

@@ -1,6 +1,8 @@
 package net.bourgau.philippe.concurrency.kata.common;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -8,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 public class InProcessChatRoom implements ChatRoom {
 
     private final Map<Output, String> clients;
+    private final List<String> loginMessages = new ArrayList<>();
     private CountDownLatch abandonLatch = new CountDownLatch(1);
 
     public InProcessChatRoom(Map<Output, String> emptyClientsMap) {
@@ -17,12 +20,43 @@ public class InProcessChatRoom implements ChatRoom {
     @Override
     public void enter(Output client, String pseudo) {
         clients.put(client, pseudo);
+        sendLoginMessages(client);
         broadcast(Message.welcome(pseudo));
+    }
+
+    private void sendLoginMessages(Output client) {
+        for (String loginMessage : loginMessages) {
+            client.write(loginMessage);
+        }
     }
 
     @Override
     public void broadcast(Output client, String message) {
-        broadcast(Message.signed(clients.get(client), message));
+        boolean loginMessage = isLoginMessage(message);
+
+        if (loginMessage) {
+            message = cleanLoginMessage(message);
+        }
+
+        message = Message.signed(clients.get(client), message);
+
+        if (loginMessage) {
+            storeLoginMessage(message);
+        }
+
+        broadcast(message);
+    }
+
+    private String cleanLoginMessage(String message) {
+        return message.substring(GOD_PREFIX.length());
+    }
+
+    private boolean isLoginMessage(String message) {
+        return message.startsWith(GOD_PREFIX);
+    }
+
+    private void storeLoginMessage(String message) {
+        loginMessages.add(message);
     }
 
     private void broadcast(String message) {
