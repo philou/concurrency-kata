@@ -16,4 +16,8 @@ public final class Message {
     public static String selfExit() {
         return "You left the room";
     }
+
+    public static String login(String message) {
+        return ChatRoom.GOD_PREFIX + message;
+    }
 }

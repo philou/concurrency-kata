@@ -21,4 +21,5 @@ public class CountingOutput implements Output {
     public IntegerAssert assertMessageCount() {
         return Assertions.assertThat(messageCount.get());
     }
+
 }

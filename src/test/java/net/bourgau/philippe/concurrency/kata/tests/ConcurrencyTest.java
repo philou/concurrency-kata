@@ -2,10 +2,9 @@ package net.bourgau.philippe.concurrency.kata.tests;
 
 import net.bourgau.philippe.concurrency.kata.CountingOutput;
 import net.bourgau.philippe.concurrency.kata.Implementations;
+import net.bourgau.philippe.concurrency.kata.MatchingOutput;
 import net.bourgau.philippe.concurrency.kata.NullOutput;
-import net.bourgau.philippe.concurrency.kata.common.ChatRoom;
-import net.bourgau.philippe.concurrency.kata.common.Client;
-import net.bourgau.philippe.concurrency.kata.common.Implementation;
+import net.bourgau.philippe.concurrency.kata.common.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,6 +13,7 @@ import org.junit.runners.Parameterized;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 
 import static com.jayway.awaitility.Awaitility.await;
@@ -22,7 +22,8 @@ import static com.jayway.awaitility.Duration.FIVE_SECONDS;
 @RunWith(Parameterized.class)
 public class ConcurrencyTest {
 
-    private static final int NB_CLIENTS = 500;
+    public static final int NB_LOGIN_MESSAGES = 1000;
+    public static final String LOGIN_MESSAGE = "I am the boss !!!";
 
     @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> parameters() {
@@ -33,31 +34,100 @@ public class ConcurrencyTest {
     public Implementation implementation;
 
     private ChatRoom chatRoom;
-    private List<Thread> clientThreads;
+    private List<Thread> threads;
     private CountDownLatch startLatch;
     private CountingOutput countingOutput;
     private Client observer;
+    private List<MatchingOutput> allOutputs;
+    private Thread moderatorThread;
 
     @Before
     public void setUp() throws Exception {
         chatRoom = implementation.startNewChatRoom();
-        clientThreads = new ArrayList<>();
-        startLatch = new CountDownLatch(1);
+        threads = new ArrayList<>();
         countingOutput = new CountingOutput();
         observer = implementation.newClient("Observer", chatRoom, countingOutput);
+        allOutputs = new CopyOnWriteArrayList<>();
+
+        enterObserver();
+    }
+
+    private void setNumberOfThreads(int count) {
+        startLatch = new CountDownLatch(count);
     }
 
     @Test
-    public void it_should_handle_many_clients_concurrently() throws Exception {
-        enterObserver();
+    public void
+    it_should_handle_many_clients_concurrently() throws Exception {
+        final int nbClients = 500;
+        setNumberOfThreads(nbClients);
 
-        for (int i = 0; i < NB_CLIENTS; i++) {
-            clientThreads.add(new Thread(new EnterQuit(newClient(i))));
+        for (int i = 0; i < nbClients; i++) {
+            createThread(new EnterQuit(newClient(i)));
         }
 
-        runClientThreads();
+        runThreads();
 
-        await().atMost(FIVE_SECONDS).until(messageCountIs(NB_CLIENTS * 3));
+        await().atMost(FIVE_SECONDS).until(messageCountIs(nbClients * 3));
+    }
+
+    @Test
+    public void
+    new_clients_should_all_receive_all_login_messages() throws Exception {
+        final int nbThreads = 2;
+        setNumberOfThreads(nbThreads + 1);
+
+        moderatorThread = new Thread(moderatorGoneWild());
+        moderatorThread.start();
+
+        for (int i = 0; i < nbThreads; i++) {
+            createThread(enterClients("Client-" + i + "-"));
+        }
+
+        runThreads();
+
+        await().atMost(FIVE_SECONDS).until(allClientsReceived(NB_LOGIN_MESSAGES));
+    }
+
+    private Runnable allClientsReceived(final int expectedMessageCount) {
+        return new Runnable() {
+            @Override
+            public void run() {
+                for (MatchingOutput output : allOutputs) {
+                    output.assertMessageCount().isEqualTo(expectedMessageCount);
+                }
+            }
+        };
+    }
+
+    private void createThread(Runnable runnable) {
+        threads.add(new Thread(runnable));
+    }
+
+    private ConcurrentRunnable enterClients(final String clientPseudoPrefix) {
+        return new ConcurrentRunnable() {
+            @Override
+            public void go() throws Exception {
+                int j = 0;
+                while (moderatorThread.isAlive()) {
+                    final MatchingOutput output = new MatchingOutput(LOGIN_MESSAGE);
+                    Client client = implementation.newClient(clientPseudoPrefix + j, chatRoom, output);
+                    client.enter();
+                    allOutputs.add(output);
+                }
+            }
+        };
+    }
+
+    private ConcurrentRunnable moderatorGoneWild() {
+        return new ConcurrentRunnable() {
+            @Override
+            protected void go() throws Exception {
+                for (int i = 0; i < NB_LOGIN_MESSAGES; i++) {
+                    observer.announce(Message.login(LOGIN_MESSAGE));
+                }
+            }
+        };
     }
 
     private void enterObserver() throws Exception {
@@ -79,19 +149,31 @@ public class ConcurrencyTest {
         };
     }
 
-    private void runClientThreads() throws InterruptedException {
-        for (Thread clientThread : clientThreads) {
-            clientThread.start();
+    private void runThreads() throws InterruptedException {
+        for (Thread thread : threads) {
+            thread.start();
         }
 
-        startLatch.countDown();
-
-        for (Thread clientThread : clientThreads) {
-            clientThread.join();
+        for (Thread thread : threads) {
+            thread.join();
         }
     }
 
-    private class EnterQuit implements Runnable {
+    private abstract class ConcurrentRunnable extends UnsafeRunnable {
+
+        @Override
+        public void doRun() throws Exception {
+            startLatch.countDown();
+            startLatch.await();
+
+            go();
+        }
+
+        protected abstract void go() throws Exception;
+    }
+
+
+    private class EnterQuit extends ConcurrentRunnable {
         private final Client client;
 
         public EnterQuit(Client client) {
@@ -100,18 +182,10 @@ public class ConcurrencyTest {
         }
 
         @Override
-        public void run() {
-            try {
-                startLatch.await();
-
-                client.enter();
-                client.announce("Hi !");
-                client.leave();
-
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-
+        public void go() throws Exception {
+            client.enter();
+            client.announce("Hi !");
+            client.leave();
         }
     }
 }

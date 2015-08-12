@@ -142,7 +142,7 @@ public class EndToEndTest {
         jack.enter();
         joeShouldReceive(welcome("Jack"));
 
-        jack.announce(ChatRoom.GOD_PREFIX + "You are belong to me !");
+        jack.announce(login("You are belong to me !"));
 
         joeShouldReceive(signed("Jack", "You are belong to me !"));
         jackShouldReceive(signed("Jack", "You are belong to me !"));
@@ -151,7 +151,7 @@ public class EndToEndTest {
     @Test
     public void
     new_clients_should_receive_previous_login_message() throws Exception {
-        joe.announce(ChatRoom.GOD_PREFIX + "WARNING: No soccer talk around here !");
+        joe.announce(login("WARNING: No soccer talk around here !"));
 
         jack.enter();
         joeShouldReceive(welcome("Jack"));
