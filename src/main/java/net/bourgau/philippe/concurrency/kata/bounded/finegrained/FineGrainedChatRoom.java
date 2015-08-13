@@ -8,21 +8,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-public class InProcessChatRoom implements ChatRoom {
+public class FineGrainedChatRoom implements ChatRoom {
 
     private final Map<Output, String> clients;
     private final List<String> loginMessages = new ArrayList<>();
     private CountDownLatch abandonLatch = new CountDownLatch(1);
 
-    public InProcessChatRoom(Map<Output, String> emptyClientsMap) {
-        clients = emptyClientsMap;
+    public FineGrainedChatRoom() {
+        clients = new ConcurrentHashMap<>();
     }
 
     @Override
-    public void enter(Output client, String pseudo) {
+    public synchronized void enter(Output client, String pseudo) {
         clients.put(client, pseudo);
         sendLoginMessages(client);
         broadcast(Message.welcome(pseudo));
@@ -59,7 +60,7 @@ public class InProcessChatRoom implements ChatRoom {
         return message.startsWith(GOD_PREFIX);
     }
 
-    private void storeLoginMessage(String message) {
+    private synchronized void storeLoginMessage(String message) {
         loginMessages.add(message);
     }
 

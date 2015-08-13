@@ -86,15 +86,15 @@ public class ConcurrencyTest {
 
         runThreads();
 
-        await().atMost(FIVE_SECONDS).until(allClientsReceived(NB_LOGIN_MESSAGES));
+        await().atMost(FIVE_SECONDS).until(allClientsReceivedAtLeast(NB_LOGIN_MESSAGES));
     }
 
-    private Runnable allClientsReceived(final int expectedMessageCount) {
+    private Runnable allClientsReceivedAtLeast(final int expectedMessageCount) {
         return new Runnable() {
             @Override
             public void run() {
                 for (MatchingOutput output : allOutputs) {
-                    output.assertMessageCount().isEqualTo(expectedMessageCount);
+                    output.assertMessageCount().isGreaterThanOrEqualTo(expectedMessageCount);
                 }
             }
         };
