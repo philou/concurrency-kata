@@ -41,14 +41,27 @@ There are 2 ways to explore this kata : through git or through the IDE.
 
 If you have the time, this should teach you all that there is to learn from this kata. You might start from the first MONOTHREAD tag and then study the commits up to master to see how the different implementations were created, refactored and benchmarked. One drawback though is that you might loose some time understanding some implementation details along the way.
 
+Here are a few commands to do the exploration through git :
+
+* Having a look at the starting point : ```git checkout MONOTHREAD```
+* To get a summary of the changes : ```git log --decorate --oneline MONOTHREAD..BOUNDED-FINE-GRAINED```
+* Get the details of the commit messges : ```git log --decorate MONOTHREAD..BOUNDED-FINE-GRAINED```
+* Get the details of all the changes in the code : ```git log --decorate --patch MONOTHREAD..BOUNDED-FINE-GRAINED```
+
 ### Through the IDE
 
-This should be the most time effective way to go through this kata. Just checkout specific tags and study the various implementations at this stage. Commits of interest are :
+This should be the most time effective way to go through this kata. Just checkout specific tags and study the various implementations at this stage. Tags of interest are :
 
 * CSP : all implementations have been benchmarked, but the chat room does not support login messages, making the bounded concurrent implementation the best by far.
 * BOUNDED-FINE-GRAINED : (or directly master) the login feature has been added, with the required fixes to bounded concurrent (corse and fine grained synchronized methods)
 
+As an example, just run ```git checkout CSP``` to checkout the csp tag
+
 ## Takeaways
+
+Here are the final results of one of the benchmarks
+
+![Result graphs of benchmark enter while others are talking](https://raw.githubusercontent.com/philou/concurrency-kata/master/enter-while-others-are-talking.png "Result graphs of benchmark enter while others are talking")
 
 Concerning Java multithreading, here is what I learned or confirmed :
 
@@ -58,7 +71,7 @@ Concerning Java multithreading, here is what I learned or confirmed :
 * If you can get away with a bounded thread pool and concurrent collections, just do it, it's rather simple, and it faster all other implementations hands down
 * When things get more complex, it's likely that you'll need to use finer grained synchronized blocks in conjunction with bounded thread pools and concurrent collections. This can still perform very well, but the complexity price is high. This usually becomes very error prone, and there is no way to ensure thread safety (I've heard of horror stories where it took weeks to trigger threading bugs)
 * This is when Actors and CSP become an interesting solutions. Actors are really not that difficult to implement in java. Their main advantage being that they are easy to reason about.
-* Actors and CSP perform rather well when we implement them with the 'green' threads
+* Actors and CSP perform rather well when implemented with the 'green' threads
 * Actors are some kind of special case of CSP
 * Refactoring Actors to CSP was an interesting problem in itself, and it made me understand CSP a lot better than before
 
